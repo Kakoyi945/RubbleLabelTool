@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.label.rubblelabeltool.mapper.PointsMapper">
+    <resultMap id="PointsMap" type="com.label.rubblelabeltool.entity.PointsEntity">
+        <result column="pid" property="id"/>
+        <result column="img_id" property="imgId"/>
+        <result column="points" property="pointsStr"/>
+    </resultMap>
+
+    <select id="queryPointsById" resultMap="PointsMap">
+        SELECT
+            *
+        FROM
+            t_points
+        WHERE
+            pid = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+            t_points(img_id, points)
+        VALUES
+            ( #{imgId},  #{pointsStr} )
+    </insert>
+
+    <select id="queryPointsIdsByImgId" resultType="java.lang.Integer">
+        SELECT
+            pid
+        FROM
+            t_points
+        WHERE
+            img_id = #{imgId}
+    </select>
+
+    <select id="queryPointsListByImgId" resultMap="PointsMap">
+        SELECT
+            *
+        FROM
+            t_points
+        WHERE
+            img_id = #{imageId}
+    </select>
+
+    <delete id="deletePointsById" >
+        DELETE
+        FROM
+            t_points
+        WHERE
+            pid = #{id}
+    </delete>
+</mapper>

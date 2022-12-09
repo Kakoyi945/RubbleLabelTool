@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.label.rubblelabeltool.mapper.ImageInfoMapper">
+    <resultMap id="ImageInfoMap" type="com.label.rubblelabeltool.entity.ImageInfoEntity">
+        <id column="img_id" property="id"/>
+        <result column="file_name" property="fileName"/>
+        <result column="raw_rgb_path" property="rawRgbPath"/>
+        <result column="raw_ice_path" property="rawIcePath"/>
+        <result column="rgb_path" property="rgbPath"/>
+        <result column="bi_path" property="biPath"/>
+        <result column="ice_path" property="icePath"/>
+        <result column="high_path" property="highLightPath"/>
+        <result column="upload_time" property="uploadTime"/>
+        <result column="is_labeled" property="isLabeled"/>
+        <result column="labeled_time" property="labeledTime"/>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+            t_img ( raw_rgb_path, file_name, raw_ice_path, rgb_path, bi_path, ice_path, high_path, edit_time, is_deleted, is_labeled)
+        VALUES 
+            ( #{rawRgbPath}, #{fileName}, #{rawIcePath}, #{rgbPath}, #{biPath}, #{icePath}, #{highLightPath}, #{editTime}, #{isDeleted}, #{isLabeled})
+    </insert>
+    
+    <select id="queryById" resultMap="ImageInfoMap">
+        SELECT 
+            *
+        FROM
+            t_img
+        WHERE
+            img_id = #{id}
+        AND
+            is_deleted = 0
+    </select>
+
+    <update id="updateLabeledTimeById">
+        UPDATE
+            t_img
+        SET
+            labeled_time = #{labeledTime}
+        WHERE
+            img_id = #{id}
+        AND
+            is_deleted = 0
+    </update>
+
+    <update id="updateLabeledImagesInfoById">
+        UPDATE
+            t_img
+        SET
+            bi_path = #{biPath}, ice_path = #{icePath}, high_path = #{highLightPath}, labeled_time = #{labeledTime}, is_labeled = 1
+        WHERE
+            img_id = #{id}
+        AND
+            is_deleted = 0
+    </update>
+
+    <select id="queryImageIdByImageName" resultType="java.lang.Integer">
+        SELECT
+            img_id
+        FROM
+            t_img
+        WHERE
+            file_name = #{fileName}
+        AND
+            is_deleted = 0
+    </select>
+
+    <select id="queryImagInfoByImageName" resultMap="ImageInfoMap">
+        SELECT
+            *
+        FROM
+            t_img
+        WHERE file_name = #{fileName}
+    </select>
+
+    <update id="updateRawRgbPathById">
+        UPDATE
+            t_img
+        SET
+            raw_rgb_path = #{rawRgbPath}
+        WHERE
+            img_id = #{id}
+        AND
+            is_deleted = 0
+    </update>
+
+    <update id="updateRawIcePathById">
+        UPDATE
+            t_img
+        SET
+            raw_ice_path = #{rawIcePath}
+        WHERE
+            img_id = #{id}
+        AND
+            is_deleted = 0
+    </update>
+
+    <select id="queryImageInfos" resultMap="ImageInfoMap">
+        SELECT
+            *
+        FROM
+            t_img
+        WHERE
+            is_deleted = 0
+        ORDER BY
+            img_id DESC
+        <if test="page != null and limit != null">
+            limit #{start}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotalImages" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            t_img
+        WHERE
+            is_deleted = 0
+    </select>
+
+    <update id="deleteImageById">
+        UPDATE
+            t_img
+        SET
+            is_deleted = 1
+        WHERE
+            img_id = #{id}
+    </update>
+
+    <select id="queryImageInfosByIdList" resultMap="ImageInfoMap" parameterType="java.util.List">
+        SELECT
+            *
+        FROM
+            t_img
+        WHERE
+            img_id
+        IN
+            <foreach collection="list" item="imgId" index="index" open="(" close=")" separator=",">
+                #{imgId}
+            </foreach>
+    </select>
+</mapper>

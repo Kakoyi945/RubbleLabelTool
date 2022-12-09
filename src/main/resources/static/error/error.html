@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ERROR</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<button id="chang-btn">按钮</button>
+</body>
+<script type="text/javascript">
+    var jsonObj = {"ptses":[{"pid":0,"filename":"abc","colPoints":[0,1,2],"rowPoints":[2,3,4]}], "image_id":7};
+    $("#chang-btn").click(function () {
+        alert("点击了");
+        $.ajax({
+            url: "/imgs/change",
+            type:"POST",
+            data:JSON.stringify(jsonObj),
+            contentType: "application/json;charset=utf-8",
+            dataType:"json",
+            success: function(json){
+                if(json.state == 200) {
+                    console.log(json.message);
+                } else {
+                    alert("something error");
+                }
+            }
+        });
+    });
+</script>
+</html>

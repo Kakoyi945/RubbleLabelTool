@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<form id="form-upload-image" enctype="multipart/form-data">
+    <input id="input-upload-image" type="file" name="image" multiple="multiple" value="请选择上传文件">
+    <input id="btn-upload-image" type="button" value="保存">
+</form>
+</body>
+<script type="text/javascript">
+    $("#btn-upload-image").click(function () {
+        var formData = new FormData();
+        var images = $("#input-upload-image")[0].files;
+        for(let image of images) {
+            formData.append("image", image);
+        }
+        formData.append("filename", "abc.jpg");
+        formData.append("img_mode", "1");
+        $.ajax({
+            url: "/imgs/upload",
+            type: "POST",
+            data: formData,
+            dataType:"JSON",
+            processData:false,
+            contentType:false,
+            success: function (json) {
+                if(json.state == 200) {
+                    alert("succeed" + json.message);
+                } else {
+                    alert("failed" + json.message);
+                }
+            },
+            error: function (xhr) {
+                alert("error," + xhr.status);
+            }
+        });
+    });
+</script>
+</html>
