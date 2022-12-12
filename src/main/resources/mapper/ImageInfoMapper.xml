@@ -6,21 +6,22 @@
     <resultMap id="ImageInfoMap" type="com.label.rubblelabeltool.entity.ImageInfoEntity">
         <id column="img_id" property="id"/>
         <result column="file_name" property="fileName"/>
+        <result column="type" property="type"/>
+        <result column="size" property="size"/>
         <result column="raw_rgb_path" property="rawRgbPath"/>
         <result column="raw_ice_path" property="rawIcePath"/>
-        <result column="rgb_path" property="rgbPath"/>
         <result column="bi_path" property="biPath"/>
         <result column="ice_path" property="icePath"/>
         <result column="high_path" property="highLightPath"/>
-        <result column="upload_time" property="uploadTime"/>
+        <result column="edit_time" property="editTime"/>
         <result column="is_labeled" property="isLabeled"/>
-        <result column="labeled_time" property="labeledTime"/>
+        <result column="is_deleted" property="isDeleted"/>
     </resultMap>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
-            t_img ( raw_rgb_path, file_name, raw_ice_path, rgb_path, bi_path, ice_path, high_path, edit_time, is_deleted, is_labeled)
+            t_img ( raw_rgb_path, file_name, raw_ice_path, bi_path, ice_path, high_path, edit_time, is_deleted, is_labeled, type, size)
         VALUES 
-            ( #{rawRgbPath}, #{fileName}, #{rawIcePath}, #{rgbPath}, #{biPath}, #{icePath}, #{highLightPath}, #{editTime}, #{isDeleted}, #{isLabeled})
+            ( #{rawRgbPath}, #{fileName}, #{rawIcePath},  #{biPath}, #{icePath}, #{highLightPath}, #{editTime}, #{isDeleted}, #{isLabeled}, #{type}, #{size} )
     </insert>
     
     <select id="queryById" resultMap="ImageInfoMap">
@@ -49,7 +50,7 @@
         UPDATE
             t_img
         SET
-            bi_path = #{biPath}, ice_path = #{icePath}, high_path = #{highLightPath}, labeled_time = #{labeledTime}, is_labeled = 1
+            bi_path = #{biPath}, ice_path = #{icePath}, high_path = #{highLightPath}, edit_time = #{labeledTime}, is_labeled = 1
         WHERE
             img_id = #{id}
         AND

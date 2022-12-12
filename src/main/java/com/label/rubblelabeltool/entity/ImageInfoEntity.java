@@ -6,42 +6,38 @@ import io.swagger.annotations.ApiModel;
 import java.util.Date;
 import java.util.Objects;
 
-@ApiModel("图片信息")
 public class ImageInfoEntity extends BaseEntity{
+    /**
+     * 图片名字
+     */
+    private String fileName;
     /**
      * 原始rgb文件路径
      */
-    @JsonIgnore
     private String rawRgbPath;
     /**
      * 原始冰雪覆盖图路径
      */
-    @JsonIgnore
     private String rawIcePath;
     /**
      * rgb路径
      */
-    @JsonIgnore
     private String rgbPath;
     /**
      * 黑白图路径
      */
-    @JsonIgnore
     private String biPath;
     /**
      * 冰雪覆盖图路径
      */
-    @JsonIgnore
     private String icePath;
     /**
      * 高亮图路径
      */
-    @JsonIgnore
     private String highLightPath;
     /**
      * 是否标注完成，默认为false
      */
-    @JsonIgnore
     private boolean isLabeled = false;
     /**
      * 上次编辑时间
@@ -50,16 +46,19 @@ public class ImageInfoEntity extends BaseEntity{
     /**
      * 图片大小
      */
-    private Integer size;
+    private Double size;
     /**
      * 图片类型
      */
     private String type;
-    /**
-     * 图片是否被删除
-     */
-    @JsonIgnore
-    private Boolean isDeleted = false;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public String getRawRgbPath() {
         return rawRgbPath;
@@ -125,11 +124,11 @@ public class ImageInfoEntity extends BaseEntity{
         this.editTime = editTime;
     }
 
-    public Integer getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 
@@ -141,33 +140,25 @@ public class ImageInfoEntity extends BaseEntity{
         this.type = type;
     }
 
-    public Boolean getDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        isDeleted = deleted;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ImageInfoEntity)) return false;
         if (!super.equals(o)) return false;
         ImageInfoEntity imageInfo = (ImageInfoEntity) o;
-        return Objects.equals(getId(), imageInfo.getId()) && Objects.equals(getFileName(), imageInfo.getFileName()) && isLabeled == imageInfo.isLabeled && Objects.equals(rawRgbPath, imageInfo.rawRgbPath) && Objects.equals(rawIcePath, imageInfo.rawIcePath) && Objects.equals(rgbPath, imageInfo.rgbPath) && Objects.equals(biPath, imageInfo.biPath) && Objects.equals(icePath, imageInfo.icePath) && Objects.equals(highLightPath, imageInfo.highLightPath) && Objects.equals(editTime, imageInfo.editTime) && Objects.equals(size, imageInfo.size) && Objects.equals(type, imageInfo.type) && Objects.equals(isDeleted, imageInfo.isDeleted);
+        return Objects.equals(getId(), imageInfo.getId()) && Objects.equals(getFileName(), imageInfo.getFileName()) && isLabeled == imageInfo.isLabeled && Objects.equals(rawRgbPath, imageInfo.rawRgbPath) && Objects.equals(rawIcePath, imageInfo.rawIcePath) && Objects.equals(rgbPath, imageInfo.rgbPath) && Objects.equals(biPath, imageInfo.biPath) && Objects.equals(icePath, imageInfo.icePath) && Objects.equals(highLightPath, imageInfo.highLightPath) && Objects.equals(editTime, imageInfo.editTime) && Objects.equals(size, imageInfo.size) && Objects.equals(type, imageInfo.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), rawRgbPath, rawIcePath, rgbPath, biPath, icePath, highLightPath, isLabeled, editTime, size, type, isDeleted);
+        return Objects.hash(super.hashCode(), rawRgbPath, rawIcePath, rgbPath, biPath, icePath, highLightPath, isLabeled, editTime, size, type);
     }
 
     @Override
     public String toString() {
         return "ImageInfoEntity{" +
                 "id='" + getId() + '\'' +
-                ", fileName='" + getFileName() + '\'' +
+                ", fileName='" + fileName + '\'' +
                 ", rawRgbPath='" + rawRgbPath + '\'' +
                 ", rawIcePath='" + rawIcePath + '\'' +
                 ", rgbPath='" + rgbPath + '\'' +
@@ -178,7 +169,6 @@ public class ImageInfoEntity extends BaseEntity{
                 ", editTime=" + editTime +
                 ", size=" + size +
                 ", type='" + type + '\'' +
-                ", isDeleted=" + isDeleted +
                 '}';
     }
 }

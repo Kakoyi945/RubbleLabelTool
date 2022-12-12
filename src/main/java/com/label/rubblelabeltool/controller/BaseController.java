@@ -28,11 +28,13 @@ public class BaseController {
             result.setState(5000);
             result.setMessage("保存图片时发生错误");
         } else if(e instanceof FileEmptyException) {
+            String message = e.getMessage();
             result.setState(6000);
-            result.setMessage("上传的文件为空");
+            result.setMessage(message);
         } else if(e instanceof FileStateException) {
+            String message = e.getMessage();
             result.setState(6001);
-            result.setMessage("上传的文件状态错误");
+            result.setMessage(message);
         } else if(e instanceof FileTypeException) {
             result.setState(6002);
             result.setMessage("上传的文件类型错误");
@@ -55,8 +57,9 @@ public class BaseController {
             result.setState(7003);
             result.setMessage("图片模式不符合要求（如需要rgb而上传的为二值图）");
         } else if(e instanceof CacheNotFoundException) {
+            String message = e.getMessage();
             result.setState(9000);
-            result.setMessage("服务器未存储该图片的缓存，如果已上传过，建议重回标注界面标注");
+            result.setMessage(message);
         }
         return result;
     }

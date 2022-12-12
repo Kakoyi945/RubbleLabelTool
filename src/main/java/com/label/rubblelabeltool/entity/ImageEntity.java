@@ -12,6 +12,10 @@ import java.util.Objects;
 
 public class ImageEntity extends BaseEntity{
     /**
+     * 文件名
+     */
+    private String fileName;
+    /**
      * 图片宽度
      */
     private Double width;
@@ -45,6 +49,14 @@ public class ImageEntity extends BaseEntity{
      * 高亮图
      */
     private Mat highLightImg;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
     public Double getWidth() {
         return width;

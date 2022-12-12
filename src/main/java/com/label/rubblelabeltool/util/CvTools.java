@@ -103,12 +103,36 @@ public class CvTools {
      * @param image
      * @return
      */
-    public static Mat JPEGToMat(BufferedImage image) {
+    public static Mat ImageToMat(BufferedImage image) {
         if(image == null) {
             throw new ImageNotFoundException("生成图片矩阵时发生错误：图片不存在");
         }
+        Integer cvType = 0;
+        switch (image.getType()) {
+            case BufferedImage.TYPE_3BYTE_BGR:
+                BufferedImage rgbImage = convertTo3ByteRGBType(image);
+                cvType = CvType.CV_8UC3;
+                break;
+            case BufferedImage.TYPE_INT_RGB:
+                cvType = CvType.CV_8UC3;
+                break;
+            case BufferedImage.TYPE_INT_ARGB:
+                cvType = CvType.CV_8UC4;
+                break;
+            case BufferedImage.TYPE_INT_ARGB_PRE:
+                cvType = CvType.CV_8UC4;
+                break;
+            case BufferedImage.TYPE_BYTE_GRAY:
+                cvType = CvType.CV_8UC1;
+                break;
+            default:
+                cvType = -1;
+        }
+        if(cvType == -1) {
+            return null;
+        }
+        Mat mat = new Mat(image.getHeight(), image.getWidth(), cvType);
         byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
-        Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
         mat.put(0,0,data);
         System.out.println(mat.size());
         return mat;
@@ -120,7 +144,7 @@ public class CvTools {
      * @return
      * @throws IOException
      */
-    public static BufferedImage MultipartFileToBufferedImage(MultipartFile file){
+    public static BufferedImage multipartFileToBufferedImage(MultipartFile file){
         BufferedImage bufferedImage;
         try {
             FileInputStream fis = (FileInputStream)file.getInputStream();
@@ -145,27 +169,15 @@ public class CvTools {
     }
 
     /**
-     * 将矩阵类型的图片转化为rgb类型图片
-     * @param mat
+     * 将
+     * @param image
      * @return
      */
-    private static BufferedImage matToRGB(Mat mat) {
-        int dataSize = mat.cols() * mat.rows() * (int)mat.elemSize();
-        byte[] data = new byte[dataSize];
-        mat.get(0,0,data);
-
-        int type = mat.channels() == 1 ? BufferedImage.TYPE_BYTE_BINARY:
-                BufferedImage.TYPE_3BYTE_BGR;
-        if(type == BufferedImage.TYPE_3BYTE_BGR) {
-            for(int i = 0; i < dataSize; i += 3) {
-                byte blue = data[i+0];
-                data[i+0] = data[i+2];
-                data[i+2] = blue;
-            }
-        }
-        BufferedImage image = new BufferedImage(mat.cols(), mat.rows(), type);
-        image.getRaster().setDataElements(0,0,mat.cols(),mat.rows(),data);
-        return image;
+    public static BufferedImage convertTo3ByteRGBType(BufferedImage image) {
+        BufferedImage convertedImage = new BufferedImage(image.getWidth(),image.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+        convertedImage.getGraphics().drawImage(image, 0, 0, null);
+        return convertedImage;
     }
 
     /**
@@ -173,20 +185,13 @@ public class CvTools {
      * @param mat 矩阵
      * @return String base64格式文件
      */
-    public static String matToBase64(Mat mat){
-        String jpg_base64 = null;
-        Imgcodecs.imwrite("resources/tmp.jpg", mat);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            ImageIO.write(matToRGB(mat), "jpg", baos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] bytes = baos.toByteArray();
+    public static String matToBase64(Mat mat, String imgType){
+        imgType = "." + imgType;
+        MatOfByte mob = new MatOfByte();
+        Imgcodecs.imencode(imgType, mat, mob);
         Base64.Encoder encoder = Base64.getEncoder();
-        jpg_base64 = encoder.encodeToString(Objects.requireNonNull(bytes));
-        // System.out.println("Mat转换成base64:" + jpg_base64);
-        return jpg_base64;
+        String imgBase64 = encoder.encodeToString(mob.toArray());
+        return imgBase64;
     }
 
     public static BufferedImage base64ToImage(String base64) throws IOException {

@@ -16,6 +16,8 @@
             t_points
         WHERE
             pid = #{id}
+        AND
+            is_deleted = 0
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
@@ -32,6 +34,8 @@
             t_points
         WHERE
             img_id = #{imgId}
+        AND
+            is_deleted = 0
     </select>
 
     <select id="queryPointsListByImgId" resultMap="PointsMap">
@@ -41,12 +45,15 @@
             t_points
         WHERE
             img_id = #{imageId}
+        AND
+            is_deleted = 0
     </select>
 
     <delete id="deletePointsById" >
-        DELETE
-        FROM
+        UPDATE
             t_points
+        SET
+            is_deleted = 1
         WHERE
             pid = #{id}
     </delete>

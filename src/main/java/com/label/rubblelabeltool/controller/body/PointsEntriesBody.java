@@ -16,7 +16,7 @@ public class PointsEntriesBody implements Serializable {
      */
     @ApiModelProperty("点集集合对象")
     @JsonProperty("ptses")
-    List<PointsEntity> points;
+    List<List<Double[]>> points;
     /**
      * 图片的id
      */
@@ -24,11 +24,11 @@ public class PointsEntriesBody implements Serializable {
     @JsonProperty("image_id")
     Integer imageId;
 
-    public List<PointsEntity> getPoints() {
+    public List<List<Double[]>> getPoints() {
         return points;
     }
 
-    public void setPoints(List<PointsEntity> points) {
+    public void setPoints(List<List<Double[]>> points) {
         this.points = points;
     }
 

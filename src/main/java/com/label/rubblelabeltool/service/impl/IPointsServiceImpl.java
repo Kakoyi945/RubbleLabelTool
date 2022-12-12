@@ -8,6 +8,7 @@ import com.label.rubblelabeltool.service.IPointsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,7 +39,16 @@ public class IPointsServiceImpl implements IPointsService {
 
     @Override
     public List<PointsEntity> getPointsListByImgId(Integer imgId) {
-        return pointsMapper.queryPointsListByImgId(imgId);
+        List<PointsEntity> pointsList = pointsMapper.queryPointsListByImgId(imgId);
+        List<PointsEntity> newPointsList = new ArrayList<>();
+        for(PointsEntity points : pointsList) {
+            String pointsStr = points.getPointsStr();
+            JSONArray array = JSON.parseArray(pointsStr);
+            List<Double[]> pointList = array.toJavaList(Double[].class);
+            points.setPointList(pointList);
+            newPointsList.add(points);
+        }
+        return newPointsList;
     }
 
     @Override

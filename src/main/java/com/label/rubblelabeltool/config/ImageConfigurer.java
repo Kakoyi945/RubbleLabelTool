@@ -54,7 +54,11 @@ public class ImageConfigurer {
      * @return
      */
     public static String getImgTypeStr(Integer bufferedImageType) {
-        return imgType.get(bufferedImageType);
+        if(bufferedImageType == BufferedImage.TYPE_INT_RGB || bufferedImageType == BufferedImage.TYPE_3BYTE_BGR) {
+            return "jpeg";
+        } else {
+            return "png";
+        }
     }
 
     /**
@@ -85,6 +89,8 @@ public class ImageConfigurer {
     public static String getImgSuffix(String type) {
         return imgSuffix.get(type);
     }
+
+    public static final String zipDir = "D:/project/rubble_detection/data/tmp/";
 
     /**
      * 限制上传文件的最大值
@@ -127,11 +133,11 @@ public class ImageConfigurer {
         imgModeMap.put(3, "ICE");
         imgModeMap.put(4, "HIGHLIGHT");
         // 初始化 imgPathMap，只设置文件的上一级文件夹
-        imgPathMap.put(0, "/raw_rgb/");
-        imgPathMap.put(1, "/raw_ice/");
-        imgPathMap.put(2, "/binary/");
-        imgPathMap.put(3, "/ice/");
-        imgPathMap.put(4, "/high_light/");
+        imgPathMap.put(0, "raw_rgb/");
+        imgPathMap.put(1, "raw_ice/");
+        imgPathMap.put(2, "binary/");
+        imgPathMap.put(3, "ice/");
+        imgPathMap.put(4, "high_light/");
         // 初始化 imgSuffix（如.jpg .png等）
         imgSuffix.put("image/jpeg", ".jpg");
         imgSuffix.put("image/png", ".png");

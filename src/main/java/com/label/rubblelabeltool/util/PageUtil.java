@@ -3,6 +3,7 @@ package com.label.rubblelabeltool.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
 public class PageUtil extends LinkedHashMap<String, Object> {
     private Integer page;
     private Integer limit;

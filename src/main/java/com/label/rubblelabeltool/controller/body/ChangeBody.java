@@ -11,11 +11,6 @@ import java.util.Objects;
 
 @ApiModel(value = "changeBody", description = "标注图像后的返回体，包含原始点集信息以及图片（以base64编码）")
 public class ChangeBody implements Serializable {
-//    /**
-//     * 点集信息
-//     */
-//    @ApiModelProperty(value = "点集信息", dataType = "List")
-//    private List<PointsEntity> pointsEntityList;
     /**
      * 点集id的集合
      */
@@ -32,11 +27,6 @@ public class ChangeBody implements Serializable {
      */
     @ApiModelProperty(value = "标注后的冰雪覆盖图", dataType = "String")
     private String iceImg;
-//    /**
-//     * 标注后的高亮图
-//     */
-//    @ApiModelProperty(value = "标注后的冰雪覆盖图", dataType = "String")
-//    private String highLightImg;
 
 
     public List<Integer> getPids() {

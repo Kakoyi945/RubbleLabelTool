@@ -1,8 +1,11 @@
 package com.label.rubblelabeltool.entity;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,20 +18,12 @@ public class BaseEntity implements Serializable {
     /**
      * id
      */
-    @JsonIgnore
+    @JsonProperty("id")
     private Integer id;
     /**
-     * 文件名
+     * 是否被删除
      */
-    private String fileName;
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+    private Boolean isDeleted;
 
     public Integer getId() {
         return id;
@@ -38,24 +33,32 @@ public class BaseEntity implements Serializable {
         this.id = id;
     }
 
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof BaseEntity)) return false;
         BaseEntity that = (BaseEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName);
+        return Objects.equals(id, that.id) && Objects.equals(isDeleted, that.isDeleted);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fileName);
+        return Objects.hash(id, isDeleted);
     }
 
     @Override
     public String toString() {
         return "BaseEntity{" +
                 "id=" + id +
-                ", fileName='" + fileName + '\'' +
+                ", isDeleted=" + isDeleted +
                 '}';
     }
 }

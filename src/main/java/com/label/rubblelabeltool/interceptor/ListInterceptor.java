@@ -1,11 +1,13 @@
 package com.label.rubblelabeltool.interceptor;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class MainInterpetor implements HandlerInterceptor {
+@Component
+public class ListInterceptor implements HandlerInterceptor {
     /**
      * 检测全局session对象是否有image数据，如果有则放行，如果没用则重定向到主界面
      * @param request 请求对象
@@ -17,11 +19,10 @@ public class MainInterpetor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 通过HttpServiceRequest对象来获取session对象
-        Object obj = request.getSession().getAttribute("uid");
-        if(obj == null) {
-            // 说明不存在该文件，则重定向到index.html目录
-            response.sendRedirect("/index.html");
-            // 结束后续调用
+        Object dirs = request.getSession().getAttribute("list");
+        if(dirs == null) {
+            // 说明不存在dirs属性，则重定向到index.html目录
+            response.sendRedirect("/imgs/directories");
             return false;
         }
         // 放行

@@ -30,7 +30,7 @@ public class IImageServiceImpl implements IImageService {
     ImageInfoMapper imageInfoMapper;
 
     @Override
-    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path) {
+    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, Double size, String type) {
         ImgMode imgMode = ImageConfigurer.getImgMode(imgModeInt);
         if(imgMode != ImgMode.RAWICE && imgMode != ImgMode.RAWRGB) {
             throw new ImageModeUnsatisfiedException("所传送的图片不是规定的类型，需求类型为原始的ice或者rgb，实际类型为" + imgMode);
@@ -39,6 +39,8 @@ public class IImageServiceImpl implements IImageService {
         ImageInfoEntity imageInfo = new ImageInfoEntity();
         imageInfo.setEditTime(uploadTime);
         imageInfo.setFileName(imageName);
+        imageInfo.setSize(size);
+        imageInfo.setType(type);
         if(imgMode == ImgMode.RAWRGB) {
             imageInfo.setRawRgbPath(path);
         } else {
@@ -70,17 +72,23 @@ public class IImageServiceImpl implements IImageService {
         Mat biImg = image.getBiImg();
         // 如果第一次标注，则biImg为空，新建biImg对象
         if(biImg == null) {
-            biImg = new Mat(image.getHighLightImg().size(), CvType.CV_8UC1, new Scalar(0));
+            biImg = new Mat(image.getRawRgbImg().size(), CvType.CV_8UC1, new Scalar(0));
             image.setBiImg(biImg);
         }
         CvTools.fillArea(biImg, mops, ImgMode.BINARY);
         image.setBiImg(biImg);
         // iceImg
         Mat iceImg = image.getIceImg();
+        if(iceImg == null) {
+            iceImg = image.getRawIceImg();
+        }
         CvTools.fillArea(iceImg, mops, ImgMode.ICE);
         image.setIceImg(iceImg);
         // highLightImg
         Mat highLightImg = image.getHighLightImg();
+        if(highLightImg == null) {
+            highLightImg = image.getRawRgbImg();
+        }
         CvTools.fillArea(highLightImg, mops, ImgMode.HIGHLIGHT);
         image.setHighLightImg(highLightImg);
         return image;
@@ -117,11 +125,9 @@ public class IImageServiceImpl implements IImageService {
     }
 
     @Override
-    public PageResultBody getImageInfos(PageUtil pageUtil) {
+    public List<ImageInfoEntity> getImageInfos(PageUtil pageUtil) {
         List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtil);
-        Integer total = imageInfoMapper.queryTotalImages();
-        PageResultBody pageResult = new PageResultBody(imageInfos, total, pageUtil.getLimit(), pageUtil.getPage());
-        return pageResult;
+        return imageInfos;
     }
 
     @Override

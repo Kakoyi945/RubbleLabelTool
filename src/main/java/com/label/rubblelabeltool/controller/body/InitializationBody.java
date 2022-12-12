@@ -20,7 +20,7 @@ public class InitializationBody implements Serializable {
      * 点集的列表
      */
     @ApiModelProperty(value = "点集的列表", dataType = "List")
-    private List<PointsEntity> points;
+    private List<List<Double[]>> points;
 
     /**
      * 初始rgb图片
@@ -54,11 +54,11 @@ public class InitializationBody implements Serializable {
         this.pids = pids;
     }
 
-    public List<PointsEntity> getPoints() {
+    public List<List<Double[]>> getPoints() {
         return points;
     }
 
-    public void setPoints(List<PointsEntity> points) {
+    public void setPoints(List<List<Double[]>> points) {
         this.points = points;
     }
 
