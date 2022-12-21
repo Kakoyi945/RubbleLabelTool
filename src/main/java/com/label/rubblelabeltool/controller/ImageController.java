@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -55,7 +53,7 @@ public class ImageController extends BaseController{
      */
     @GetMapping("directories")
     @ApiOperation("显示所有文件夹")
-    public JsonResult<List<DirectoryBody>> listDirectory(HttpSession session){
+    public ListResult<DirectoryBody> listDirectory(HttpSession session){
         List<DirectoryBody> directoryBodyList = new ArrayList<>();
         for(int i = 0; i <= 4; i++) {
             DirectoryBody directoryBody = new DirectoryBody();
@@ -73,7 +71,7 @@ public class ImageController extends BaseController{
         }
         // 设置session，用于设置访问顺序，即只有访问过/imgs/diretories界面才可以访问/imgs/list界面
         session.setAttribute("list", "list");
-        return new JsonResult<List<DirectoryBody>>(OK, directoryBodyList);
+        return new ListResult<DirectoryBody>(OK, directoryBodyList);
     }
 
     /**
@@ -86,10 +84,14 @@ public class ImageController extends BaseController{
      * 请求结果： JsonResult<Void>
      */
     @PostMapping (value = "upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiImplicitParam(name = "img_mode", value = "图片模式（0-原生rgb图， 1-原生ice图）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "img_mode", value = "图片模式（0-原生rgb图， 1-原生ice图）"),
+            @ApiImplicitParam(paramType = "form",  name = "image", value = "图片", required = true, dataType = "__file")
+    })
     @ApiOperation("接收原图、冰雪覆盖图")
-    public JsonResult<Void> uploadImage(@RequestParam("image") MultipartFile[] images,
+    public ListResult<Integer> uploadImage(@RequestParam("image") MultipartFile[] images,
                                         @RequestParam("img_mode") Integer imgModeInt) {
+        List<Integer> imgIdList = new ArrayList<>();
         for(MultipartFile image: images) {
             // 判断上传的图片是否为空
             if (image.isEmpty()) {
@@ -121,6 +123,7 @@ public class ImageController extends BaseController{
                 Date uploadTime = new Date();
                 // 获取文件夹，例如：{basepath}/raw/raw_rgb/xx.png
                 dirPath = ImageConfigurer.getImgDir(imgModeInt);
+                System.out.println(dirPath);
                 // 更新数据库
                 iImageService.uploadImage(imageName, uploadTime, imgModeInt, dirPath + imageName + suffix, size, contentType);
             } else {
@@ -131,7 +134,10 @@ public class ImageController extends BaseController{
             // 创建文件夹
             File folder = new File(dirPath);
             if (!folder.exists()) {
-                folder.mkdirs();
+                boolean isSucceed = folder.mkdirs();
+                if(!isSucceed) {
+                    throw new FileUploadIOException("文件保存时发生错误");
+                }
             }
             // 文件保存
             try {
@@ -139,8 +145,11 @@ public class ImageController extends BaseController{
             } catch (IOException e) {
                 throw new FileUploadIOException("文件保存失败");
             }
+            // 获取图像的id，保存到list中
+            ImageInfoEntity lastImageInfo = iImageService.getImageInfoByFileName(imageName);
+            imgIdList.add(lastImageInfo.getId());
         }
-        return new JsonResult<Void>(OK);
+        return new ListResult<Integer>(OK, imgIdList);
     }
 
     /**
@@ -148,44 +157,41 @@ public class ImageController extends BaseController{
      * 请求路径： /imgs/list
      * 请求参数： Integer page
      *          Integer limit
-     *          Integer is_paged
      *          HttpSession session
      * 请求类型： GET
      * 请求结果： JsonResult<PageResultBody>
      */
     @GetMapping("list")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", dataType = "int"),
             @ApiImplicitParam(name = "limit", value = "每页多少项", dataType = "int"),
             @ApiImplicitParam(name = "is_paged", value = "是否要分页，是为1，否为0，默认不分页", dataType = "int")
     })
     @ApiOperation("图片列表界面，当不需要分页时，传递page为0，limit为0，示例：list/page=1&limit=4&is_paged=1")
     public JsonResult<PageResultBody> listImages(@RequestParam("page") Integer page,
                                                  @RequestParam("limit") Integer limit,
-                                                 @RequestParam("is_paged") Integer isPaged,
                                                  HttpSession session) {
-        if(isPaged == 1 && (page == 0 || limit == 0)) {
+        if(page == 0 || limit == 0) {
             return  null;
         }
         // 将当前分页结果保存到session中，方便删除图片后重新回到list时有数据可用
         session.setAttribute("page", page);
         session.setAttribute("limit", limit);
-        session.setAttribute("is_paged", isPaged);
         Map<String, Object> params = new HashMap<>();
         params.put("page", page);
         params.put("limit", limit);
-        PageUtil pageUtil = new PageUtil(params, isPaged);
-        List<ImageInfoEntity> imageInfos = iImageService.getImageInfos(pageUtil);
+        PageUtils pageUtils = new PageUtils(params, 1);
+        List<ImageInfoEntity> imageInfos = iImageService.getImageInfos(pageUtils);
         List<PageEntryBody> pageEntries = new ArrayList<>();
         for(ImageInfoEntity imageInfo : imageInfos) {
             PageEntryBody pageEntry = new PageEntryBody();
+            pageEntry.setImgId(imageInfo.getId());
             pageEntry.setFileName(imageInfo.getFileName());
             pageEntry.setSize(imageInfo.getSize());
             pageEntry.setType(imageInfo.getType());
             pageEntry.setEditTime(imageInfo.getEditTime());
             pageEntries.add(pageEntry);
         }
-        PageResultBody pageResultBody = new PageResultBody(pageEntries, pageEntries.size(), pageUtil.getLimit(), pageUtil.getPage());
+        PageResultBody pageResultBody = new PageResultBody(pageEntries, pageEntries.size(), pageUtils.getLimit(), pageUtils.getPage());
         return new JsonResult<PageResultBody>(OK, pageResultBody);
     }
 
@@ -280,6 +286,7 @@ public class ImageController extends BaseController{
                 System.out.println("rawIceImg type 是:" + rawIceImg.getType());
                 Mat rawIceMat = CvTools.ImageToMat(rawIceImg);
                 image.setRawIceImg(rawIceMat);
+                image.setIceImg(rawIceMat);
             }
             // 将图片放入缓存中，方便submit时使用，以及拦截器设置
             session.setAttribute("imageCache", image);
@@ -400,6 +407,7 @@ public class ImageController extends BaseController{
         // 更新缓存
         session.setAttribute("imageCache", newImage);
         return new JsonResult<ChangeBody>(OK, changeBody);
+//        return null;
     }
 
     /**
@@ -411,20 +419,21 @@ public class ImageController extends BaseController{
      */
     @GetMapping("del_image")
     @ApiImplicitParam(name = "img_id", value = "图片id", dataType = "int")
-    @ApiOperation("根据图片id删除图片，并重定向到list，调试时需要先调试list接口，因为使用了session获取了list接口中的分页信息")
-    public JsonResult<Void> deleteImage(@RequestParam("img_id") Integer imgId,
+    @ApiOperation("根据图片id删除图片，调试时需要先调试list接口")
+    public JsonResult<String> deleteImage(@RequestParam("img_id") Integer imgId,
                                         HttpSession session,
                                         HttpServletResponse servletResponse) throws IOException {
         Integer count = iImageService.deleteImageInfoById(imgId);
-        Integer page = (Integer) session.getAttribute("page");
-        Integer limit = (Integer) session.getAttribute("limit");
-        Integer isPaged = (Integer) session.getAttribute("is_paged");
+//        Integer page = (Integer) session.getAttribute("page");
+//        Integer limit = (Integer) session.getAttribute("limit");
+//        Integer isPaged = (Integer) session.getAttribute("is_paged");
         if(count == 1) {
-            String url = "list?page=" + page + "&limit=" + limit + "&is_paged=" + isPaged;
-            System.out.println(url);
-            servletResponse.sendRedirect(url);
+            return new JsonResult<String>(OK, "删除成功");
+//            String url = "list?page=" + page + "&limit=" + limit + "&is_paged=" + isPaged;
+//            System.out.println(url);
+//            servletResponse.sendRedirect(url);
         }
-        return new JsonResult<Void>(DELETE_ERROR);
+        return new JsonResult<String>(DELETE_ERROR, "删除失败");
     }
 
     private void removeDir(File dir) {
@@ -440,9 +449,16 @@ public class ImageController extends BaseController{
 
     @GetMapping("download")
     @ApiOperation("下载固定类型的图片并打包为zip,0->rgb, 2->黑白, 3->ice, 4->高亮")
-    public JsonResult<Void> downloadImages(@RequestParam("img_id") List<Integer> imgIds,
+    public JsonResult<Void> downloadImages(@RequestParam("img_id") String imgIdsStr,
                                            @RequestParam("img_mode") Integer imgModeInt,
                                            HttpServletResponse response) {
+        // 将imgIdsStr转化为list
+        List<Integer> imgIdList = new ArrayList<>();
+        String[] imgIdStrs = imgIdsStr.split(",");
+        for(String imgIdStr: imgIdStrs) {
+            int imgId = Integer.parseInt(imgIdStr);
+            imgIdList.add(imgId);
+        }
         // 设置response的header
         response.setHeader("Content-Disposition", "attachment;filename=downloads.zip");
         // 生成zip文件存放位置
@@ -453,7 +469,7 @@ public class ImageController extends BaseController{
         if(!zipDir.isDirectory() && !zipDir.exists()) {
             zipDir.mkdirs();
         }
-        List<ImageInfoEntity> imageInfos = iImageService.getImageInfosByIdList(imgIds);
+        List<ImageInfoEntity> imageInfos = iImageService.getImageInfosByIdList(imgIdList);
         List<DownloadBody> downloadBodyList = new ArrayList<>();
         try {
             ServletOutputStream outputStream = response.getOutputStream();

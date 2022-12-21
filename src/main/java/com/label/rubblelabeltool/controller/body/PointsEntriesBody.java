@@ -21,7 +21,7 @@ public class PointsEntriesBody implements Serializable {
      * 图片的id
      */
     @ApiModelProperty("图片id")
-    @JsonProperty("image_id")
+    @JsonProperty("img_id")
     Integer imageId;
 
     public List<List<Double[]>> getPoints() {

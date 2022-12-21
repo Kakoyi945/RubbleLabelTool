@@ -15,9 +15,8 @@ public class SubmitInterceptor implements HandlerInterceptor {
         ImageEntity image = (ImageEntity)request.getSession().getAttribute("imageCache");
         if(image == null) {
             // 说明不存在image缓存，则打印错误信息
-            request.setAttribute("msg", "后端出错，返回到图片界面");
+            request.setAttribute("msg", "后端不存在该图片的缓存，自动返回到图片列表界面");
             request.getRequestDispatcher("/imgs/list").forward(request, response);
-
             return  false;
         }
         return true;

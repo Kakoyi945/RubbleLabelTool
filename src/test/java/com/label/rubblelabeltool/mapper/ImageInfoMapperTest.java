@@ -1,7 +1,7 @@
 package com.label.rubblelabeltool.mapper;
 
 import com.label.rubblelabeltool.entity.ImageInfoEntity;
-import com.label.rubblelabeltool.util.PageUtil;
+import com.label.rubblelabeltool.util.PageUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,8 +91,8 @@ public class ImageInfoMapperTest {
         Map<String, Object> pageInfoMap = new HashMap<>();
         pageInfoMap.put("page", 1);
         pageInfoMap.put("limit", 4);
-        PageUtil pageUtil = new PageUtil(pageInfoMap, 1);
-        List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtil);
+        PageUtils pageUtils = new PageUtils(pageInfoMap, 1);
+        List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtils);
         for(ImageInfoEntity imageInfo: imageInfos){
             System.out.println(imageInfo.toString());
         }

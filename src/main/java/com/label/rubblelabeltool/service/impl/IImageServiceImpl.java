@@ -2,8 +2,6 @@ package com.label.rubblelabeltool.service.impl;
 
 import com.label.rubblelabeltool.config.ImageConfigurer;
 import com.label.rubblelabeltool.config.ImgMode;
-import com.label.rubblelabeltool.controller.body.PageResultBody;
-import com.label.rubblelabeltool.controller.ex.FileEmptyException;
 import com.label.rubblelabeltool.controller.ex.ImageInfoErrorException;
 import com.label.rubblelabeltool.entity.ImageEntity;
 import com.label.rubblelabeltool.entity.ImageInfoEntity;
@@ -12,17 +10,13 @@ import com.label.rubblelabeltool.mapper.ImageInfoMapper;
 import com.label.rubblelabeltool.service.IImageService;
 import com.label.rubblelabeltool.service.ex.*;
 import com.label.rubblelabeltool.util.CvTools;
-import com.label.rubblelabeltool.util.PageUtil;
+import com.label.rubblelabeltool.util.PageUtils;
 import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class IImageServiceImpl implements IImageService {
@@ -60,14 +54,6 @@ public class IImageServiceImpl implements IImageService {
 
     @Override
     public ImageEntity changeImage(ImageEntity image, List<PointsEntity> ptes) {
-        if(ptes.size() == 0) {
-            throw new PointsEmptyException("传入的点集为空");
-        }
-        // 计算缩放比例
-        CvTools.calScaler(image.getWidth(), image.getHeight(), ImageConfigurer.times);
-        // 先将点集转化为List<MatOfPoint>形式
-        List<MatOfPoint> mops = CvTools.changePtsToMops(ptes);
-        // 填充点集圈出来的区域
         // biImg
         Mat biImg = image.getBiImg();
         // 如果第一次标注，则biImg为空，新建biImg对象
@@ -75,20 +61,32 @@ public class IImageServiceImpl implements IImageService {
             biImg = new Mat(image.getRawRgbImg().size(), CvType.CV_8UC1, new Scalar(0));
             image.setBiImg(biImg);
         }
-        CvTools.fillArea(biImg, mops, ImgMode.BINARY);
-        image.setBiImg(biImg);
         // iceImg
         Mat iceImg = image.getIceImg();
         if(iceImg == null) {
             iceImg = image.getRawIceImg();
         }
-        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
-        image.setIceImg(iceImg);
         // highLightImg
         Mat highLightImg = image.getHighLightImg();
         if(highLightImg == null) {
             highLightImg = image.getRawRgbImg();
         }
+        // 如果传入的点集为空，则填充全部图像并返回
+        if(ptes.size() == 0) {
+            image.setBiImg(biImg);
+            image.setIceImg(iceImg);
+            image.setHighLightImg(highLightImg);
+            return image;
+        }
+        // 计算缩放比例
+        CvTools.calScaler(image.getWidth(), image.getHeight(), ImageConfigurer.times);
+        // 先将点集转化为List<MatOfPoint>形式
+        List<MatOfPoint> mops = CvTools.changePtsToMops(ptes);
+        // 填充点集圈出来的区域
+        CvTools.fillArea(biImg, mops, ImgMode.BINARY);
+        image.setBiImg(biImg);
+        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
+        image.setIceImg(iceImg);
         CvTools.fillArea(highLightImg, mops, ImgMode.HIGHLIGHT);
         image.setHighLightImg(highLightImg);
         return image;
@@ -125,8 +123,8 @@ public class IImageServiceImpl implements IImageService {
     }
 
     @Override
-    public List<ImageInfoEntity> getImageInfos(PageUtil pageUtil) {
-        List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtil);
+    public List<ImageInfoEntity> getImageInfos(PageUtils pageUtils) {
+        List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtils);
         return imageInfos;
     }
 

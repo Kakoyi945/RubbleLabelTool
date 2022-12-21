@@ -22,9 +22,9 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
-            t_points(img_id, points)
+            t_points(img_id, points, is_deleted)
         VALUES
-            ( #{imgId},  #{pointsStr} )
+            ( #{imgId},  #{pointsStr}, #{isDeleted} )
     </insert>
 
     <select id="queryPointsIdsByImgId" resultType="java.lang.Integer">

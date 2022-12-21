@@ -8,6 +8,7 @@
 <body>
 <form id="form-upload-image" enctype="multipart/form-data">
     <input id="input-upload-image" type="file" name="image" multiple="multiple" value="请选择上传文件">
+    <input id="input-upload-image-mode" type="text" name="mode" value="0为rgb，1为ice">
     <input id="btn-upload-image" type="button" value="保存">
 </form>
 </body>
@@ -15,11 +16,12 @@
     $("#btn-upload-image").click(function () {
         var formData = new FormData();
         var images = $("#input-upload-image")[0].files;
+        var img_mode = $("#input-upload-image-mode")[0].value;
+        alert(img_mode);
         for(let image of images) {
             formData.append("image", image);
         }
-        formData.append("filename", "abc.jpg");
-        formData.append("img_mode", "1");
+        formData.append("img_mode",  parseInt(img_mode));
         $.ajax({
             url: "/imgs/upload",
             type: "POST",
@@ -29,9 +31,9 @@
             contentType:false,
             success: function (json) {
                 if(json.state == 200) {
-                    alert("succeed" + json.message);
+                    alert("succeed  " + json.list);
                 } else {
-                    alert("failed" + json.message);
+                    alert("failed   " + json.message);
                 }
             },
             error: function (xhr) {

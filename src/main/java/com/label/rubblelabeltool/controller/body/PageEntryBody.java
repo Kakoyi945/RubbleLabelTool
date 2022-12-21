@@ -1,14 +1,42 @@
 package com.label.rubblelabeltool.controller.body;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 public class PageEntryBody implements Serializable {
+    /**
+     * 图片id
+     */
+    @JsonProperty("img_id")
+    private Integer imgId;
+    /**
+     * 图片名字
+     */
+    @JsonProperty("filename")
     private String fileName;
+    /**
+     * 图片类型
+     */
     private String type;
+    /**
+     * 图片大小
+     */
     private Double size;
+    /**
+     * 上次编辑时间
+     */
     private Date editTime;
+
+    public Integer getImgId() {
+        return imgId;
+    }
+
+    public void setImgId(Integer imgId) {
+        this.imgId = imgId;
+    }
 
     public String getFileName() {
         return fileName;

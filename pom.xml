@@ -42,13 +42,22 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--   opencv库     -->
+        <!--opencv库-->
+<!--        <dependency>-->
+<!--            <groupId>org.opencv</groupId>-->
+<!--            <artifactId>opencv</artifactId>-->
+<!--            <version>4.6.0</version>-->
+<!--        </dependency>-->
+        <!--   集成swagger-ui自动生产API文档     -->
+        <!-- OpenCV -->
         <dependency>
             <groupId>org.opencv</groupId>
             <artifactId>opencv</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}\src\main\resources\lib\opencv-460.jar</systemPath>
             <version>4.6.0</version>
         </dependency>
-        <!--   集成swagger-ui自动生产API文档     -->
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -64,6 +73,11 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.28</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>net.java.dev.jna</groupId>-->
+<!--            <artifactId>jna</artifactId>-->
+<!--            <version>5.7.0</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -71,6 +85,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
             </plugin>
         </plugins>
     </build>

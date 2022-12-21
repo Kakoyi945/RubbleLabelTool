@@ -1,5 +1,6 @@
 package com.label.rubblelabeltool.config;
 
+import com.label.rubblelabeltool.util.ServerRealPathUtils;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -67,8 +68,9 @@ public class ImageConfigurer {
      * @return 文件路径
      */
     public static String getImgDir(Integer imgMode) {
-        String basePath = "D:/project/rubble_detection/data/raw/";
-        return basePath + imgPathMap.get(imgMode);
+        // String basePath = "D:/project/rubble_detection/data/raw/";
+        // String basePath = "/home/ices/labeltool/labeled/";
+        return ServerRealPathUtils.getPath("raw/" + imgPathMap.get(imgMode));
     }
 
     /**
@@ -77,8 +79,9 @@ public class ImageConfigurer {
      * @return
      */
     public static String getLabeledImgDir(Integer imgMode) {
-        String basePath = "D:/project/rubble_detection/data/labeled/";
-        return basePath + imgPathMap.get(imgMode);
+        // String basePath = "D:/project/rubble_detection/data/labeled/";
+        // String basePath = "/home/ices/labeltool/data/labeled/";
+        return ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
     }
 
     /**
@@ -90,7 +93,9 @@ public class ImageConfigurer {
         return imgSuffix.get(type);
     }
 
-    public static final String zipDir = "D:/project/rubble_detection/data/tmp/";
+    // public static final String zipDir = "D:/project/rubble_detection/data/tmp/";
+    // public static final String zipDir = "/home/ices/labeltool/tmp";
+    public static final String zipDir = ServerRealPathUtils.getPath("tmp");
 
     /**
      * 限制上传文件的最大值
@@ -101,11 +106,6 @@ public class ImageConfigurer {
      * 限制上传图片类型
      */
     public static final List<String> IMAGE_TYPE = new ArrayList<>();
-
-    /**
-     * dll文件位置
-     */
-    public static final String DLLS = "src/main/resources/dlls/";
 
     /**
      * 点集的缩放比例

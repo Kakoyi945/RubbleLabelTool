@@ -1,19 +1,12 @@
 package com.label.rubblelabeltool.service;
 
-import com.label.rubblelabeltool.config.ImgMode;
-import com.label.rubblelabeltool.controller.body.PageResultBody;
 import com.label.rubblelabeltool.entity.ImageEntity;
 import com.label.rubblelabeltool.entity.ImageInfoEntity;
 import com.label.rubblelabeltool.entity.PointsEntity;
-import com.label.rubblelabeltool.util.PageUtil;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.springframework.web.multipart.MultipartFile;
+import com.label.rubblelabeltool.util.PageUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 图像服务接口
@@ -81,10 +74,10 @@ public interface IImageService {
 
     /**
      * 实现分页工农
-     * @param pageUtil
+     * @param pageUtils
      * @return
      */
-    List<ImageInfoEntity> getImageInfos(PageUtil pageUtil);
+    List<ImageInfoEntity> getImageInfos(PageUtils pageUtils);
 
     /**
      * 根据图片id删除图片

@@ -4,11 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
-public class PageUtil extends LinkedHashMap<String, Object> {
+public class PageUtils extends LinkedHashMap<String, Object> {
     private Integer page;
     private Integer limit;
 
-    public PageUtil(Map<String, Object> params, Integer isPaged) {
+    public PageUtils(Map<String, Object> params, Integer isPaged) {
         this.putAll(params);
 
         this.page = Integer.parseInt(params.get("page").toString());

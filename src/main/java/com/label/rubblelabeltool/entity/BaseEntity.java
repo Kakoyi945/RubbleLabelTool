@@ -23,7 +23,8 @@ public class BaseEntity implements Serializable {
     /**
      * 是否被删除
      */
-    private Boolean isDeleted;
+    @JsonIgnore
+    private Boolean isDeleted = false;
 
     public Integer getId() {
         return id;
