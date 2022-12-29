@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class ParameterErrorException extends RuntimeException{
+public class ParameterErrorException extends ControllerException{
     public ParameterErrorException() {
         super();
     }

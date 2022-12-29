@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class FileUploadException extends RuntimeException{
+public class FileUploadException extends ControllerException{
     public FileUploadException() {
         super();
     }

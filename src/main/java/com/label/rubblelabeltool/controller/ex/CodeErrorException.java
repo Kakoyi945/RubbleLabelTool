@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class CodeErrorException extends RuntimeException{
+public class CodeErrorException extends ControllerException{
     public CodeErrorException() {
         super();
     }

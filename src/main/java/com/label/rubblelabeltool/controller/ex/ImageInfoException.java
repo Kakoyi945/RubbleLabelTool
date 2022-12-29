@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class ImageInfoException extends RuntimeException{
+public class ImageInfoException extends ControllerException{
     public ImageInfoException() {
         super();
     }

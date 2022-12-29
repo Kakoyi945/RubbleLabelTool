@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class FileStateException extends FileUploadException{
+public class FileStateException extends ControllerException{
     public FileStateException() {
         super();
     }

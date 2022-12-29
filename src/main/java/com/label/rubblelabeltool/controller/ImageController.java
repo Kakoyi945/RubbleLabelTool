@@ -163,12 +163,14 @@ public class ImageController extends BaseController{
      */
     @GetMapping("list")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "第几页", dataType = "int"),
             @ApiImplicitParam(name = "limit", value = "每页多少项", dataType = "int"),
-            @ApiImplicitParam(name = "is_paged", value = "是否要分页，是为1，否为0，默认不分页", dataType = "int")
+            @ApiImplicitParam(name = "img_mode", value = "要展示什么类型的图片（0为原始rgb，1为原始ice，2为bi，3为ice，4为高亮）", dataType = "int")
     })
-    @ApiOperation("图片列表界面，当不需要分页时，传递page为0，limit为0，示例：list/page=1&limit=4&is_paged=1")
+    @ApiOperation("图片列表界面，当不需要分页时，传递page为0，limit为0，示例：list/page=1&img_mode=0")
     public JsonResult<PageResultBody> listImages(@RequestParam("page") Integer page,
                                                  @RequestParam("limit") Integer limit,
+                                                 @RequestParam("img_mode") Integer imgModeInt,
                                                  HttpSession session) {
         if(page == 0 || limit == 0) {
             return  null;
@@ -183,6 +185,10 @@ public class ImageController extends BaseController{
         List<ImageInfoEntity> imageInfos = iImageService.getImageInfos(pageUtils);
         List<PageEntryBody> pageEntries = new ArrayList<>();
         for(ImageInfoEntity imageInfo : imageInfos) {
+            ImgMode imgMode = ImageConfigurer.getImgMode(imgModeInt);
+            if((imgMode == ImgMode.ICE || imgMode == ImgMode.BINARY || imgMode == ImgMode.HIGHLIGHT) && !imageInfo.isLabeled()) {
+                continue;
+            }
             PageEntryBody pageEntry = new PageEntryBody();
             pageEntry.setImgId(imageInfo.getId());
             pageEntry.setFileName(imageInfo.getFileName());
@@ -202,7 +208,7 @@ public class ImageController extends BaseController{
      * 请求类型： GET
      * 请求结果： JsonResult<InitializationBody>
      */
-    @GetMapping(value = {"edit", "label"})
+    @GetMapping("edit")
     @ApiImplicitParam(name = "img_id", value = "图片id", dataType = "int")
     @ApiOperation("当打开编辑页面或者打开标注页面时，返回4种图片（如果有的话），点集以及点集id")
     public JsonResult<InitializationBody> editImage(@RequestParam("img_id") Integer imageId,
@@ -239,7 +245,7 @@ public class ImageController extends BaseController{
             String rawRgbBase64 = CvTools.BufferedImageToBase64(rawRgbImg, typeStr);
             initialization.setRawRgbImg(rawRgbBase64);
             // 保存到image缓存中
-            System.out.println("rawRgbImg type 是:" + rawRgbImg.getType());
+//            System.out.println("rawRgbImg type 是:" + rawRgbImg.getType());
             Mat rawRgbMat = CvTools.ImageToMat(rawRgbImg);
             image.setRawRgbImg(rawRgbMat);
             // 判断是否标注过
@@ -253,7 +259,7 @@ public class ImageController extends BaseController{
                 String iceBase64 = CvTools.BufferedImageToBase64(iceImg, iceTypeStr);
                 initialization.setIceImg(iceBase64);
                 // 将ice填充到缓存中
-                System.out.println("iceImg type 是:" + iceImg.getType());
+//                System.out.println("iceImg type 是:" + iceImg.getType());
                 Mat iceMat = CvTools.ImageToMat(iceImg);
                 image.setIceImg(iceMat);
                 // binary
@@ -264,7 +270,7 @@ public class ImageController extends BaseController{
                 String biBase64 = CvTools.BufferedImageToBase64(biImg, biTypeStr);
                 initialization.setBiImg(biBase64);
                 // 将binary填充到缓存中
-                System.out.println("biImg type 是：" + biImg.getType());
+//                System.out.println("biImg type 是：" + biImg.getType());
                 Mat biMat = CvTools.ImageToMat(biImg);
                 image.setBiImg(biMat);
                 // highLight
@@ -275,7 +281,7 @@ public class ImageController extends BaseController{
                 String highLightBase64 = CvTools.BufferedImageToBase64(highLightImg, highLightTypeStr);
                 initialization.setHighLightImg(highLightBase64);
                 // 将highLight填充到缓存中
-                System.out.println("highLightImg type 是:" + highLightImg.getType());
+//                System.out.println("highLightImg type 是:" + highLightImg.getType());
                 Mat highLightMat = CvTools.ImageToMat(highLightImg);
                 image.setHighLightImg(highLightMat);
 
@@ -283,7 +289,7 @@ public class ImageController extends BaseController{
                 // 填充原始ice
                 BufferedImage rawIceImg = ImageIO.read(new File(rawIcePath));
                 // 将原始ice填充到缓存中
-                System.out.println("rawIceImg type 是:" + rawIceImg.getType());
+//                System.out.println("rawIceImg type 是:" + rawIceImg.getType());
                 Mat rawIceMat = CvTools.ImageToMat(rawIceImg);
                 image.setRawIceImg(rawIceMat);
                 image.setIceImg(rawIceMat);
@@ -295,18 +301,26 @@ public class ImageController extends BaseController{
         }
         // 填充点集id列表和点集列表
         List<PointsEntity> oldPointsList = iPointsService.getPointsListByImgId(imageId);
-        List<List<Double[]>> pointsList = new ArrayList<>();
-        List<Integer> pointsIds = new ArrayList<>();
-        for(PointsEntity points: oldPointsList){
-            Integer id = points.getId();
-            pointsIds.add(id);
-            // 将str类型的点集转化位List
-            JSONArray array = JSONArray.parseArray(points.getPointsStr());
-            List<Double[]> pointList = array.toJavaList(Double[].class);
-            pointsList.add(pointList);
+        List<PointsDataBody> pointsDataBodyList = new ArrayList<>();
+        for(PointsEntity points: oldPointsList) {
+            PointsDataBody pointsData = new PointsDataBody();
+            pointsData.setPid(points.getId());
+            pointsData.setPoints(points.getPointList());
+            pointsDataBodyList.add(pointsData);
         }
-        initialization.setPoints(pointsList);
-        initialization.setPids(pointsIds);
+        initialization.setPointsData(pointsDataBodyList);
+//        List<List<Double[]>> pointsList = new ArrayList<>();
+//        List<Integer> pointsIds = new ArrayList<>();
+//        for(PointsEntity points: oldPointsList){
+//            Integer id = points.getId();
+//            pointsIds.add(id);
+//            // 将str类型的点集转化位List
+//            JSONArray array = JSONArray.parseArray(points.getPointsStr());
+//            List<Double[]> pointList = array.toJavaList(Double[].class);
+//            pointsList.add(pointList);
+//        }
+//        initialization.setPoints(pointsList);
+//        initialization.setPids(pointsIds);
         return new JsonResult<InitializationBody>(OK, initialization);
     }
 
@@ -542,13 +556,13 @@ public class ImageController extends BaseController{
             image.setWidth((double) rawRgbImg.getWidth());
             image.setHeight((double) rawRgbImg.getHeight());
             // 保存到image缓存中
-            System.out.println("rawRgbImg type 是:" + rawRgbImg.getType());
+//            System.out.println("rawRgbImg type 是:" + rawRgbImg.getType());
             Mat rawRgbMat = CvTools.ImageToMat(rawRgbImg);
             image.setRawRgbImg(rawRgbMat);
             // 填充原始ice
             BufferedImage rawIceImg = ImageIO.read(new File(rawIcePath));
             // 将原始ice填充到缓存中
-            System.out.println("rawIceImg type 是:" + rawIceImg.getType());
+//            System.out.println("rawIceImg type 是:" + rawIceImg.getType());
             Mat rawIceMat = CvTools.ImageToMat(rawIceImg);
             image.setRawIceImg(rawIceMat);
 

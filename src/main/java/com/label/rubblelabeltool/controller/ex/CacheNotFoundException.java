@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class CacheNotFoundException extends RuntimeException{
+public class CacheNotFoundException extends ControllerException{
     public CacheNotFoundException() {
         super();
     }

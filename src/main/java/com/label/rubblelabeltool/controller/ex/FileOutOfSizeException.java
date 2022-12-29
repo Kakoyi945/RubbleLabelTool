@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class FileOutOfSizeException extends FileUploadException{
+public class FileOutOfSizeException extends ControllerException{
     public FileOutOfSizeException() {
         super();
     }

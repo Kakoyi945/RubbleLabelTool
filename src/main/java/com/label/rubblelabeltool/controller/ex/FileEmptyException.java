@@ -1,6 +1,6 @@
 package com.label.rubblelabeltool.controller.ex;
 
-public class FileEmptyException extends FileUploadException{
+public class FileEmptyException extends ControllerException{
     public FileEmptyException() {
         super();
     }
