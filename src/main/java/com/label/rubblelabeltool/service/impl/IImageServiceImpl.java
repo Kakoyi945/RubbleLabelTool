@@ -85,7 +85,8 @@ public class IImageServiceImpl implements IImageService {
         // 填充点集圈出来的区域
         CvTools.fillArea(biImg, mops, ImgMode.BINARY);
         image.setBiImg(biImg);
-        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
+        // 由于一开始以为冰雪覆盖图也需要标注，所以添加了iceImg的字段，为了省事，直接把标注冰雪覆盖图代码注释了
+        // CvTools.fillArea(iceImg, mops, ImgMode.ICE);
         image.setIceImg(iceImg);
         CvTools.fillArea(highLightImg, mops, ImgMode.HIGHLIGHT);
         image.setHighLightImg(highLightImg);

@@ -3,6 +3,7 @@ package com.label.rubblelabeltool.controller;
 import com.label.rubblelabeltool.controller.ex.*;
 import com.label.rubblelabeltool.service.ex.*;
 import com.label.rubblelabeltool.util.JsonResult;
+import com.label.rubblelabeltool.util.ex.UtilException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpSession;
@@ -18,7 +19,7 @@ public class BaseController {
 
     // 请求处理方法，这个方法的返回值就是需要传递给前端的数据
     // 自动将异常对象传递给此方法的参数列表上
-    @ExceptionHandler({ServiceException.class, FileUploadException.class, IOException.class})
+    @ExceptionHandler({ServiceException.class, FileUploadException.class, IOException.class, ControllerException.class, UtilException.class})
     public JsonResult<Void> handleException(Throwable e) {
         JsonResult<Void> result = new JsonResult<>(e);
         if(e instanceof ImageDuplicatedException) {

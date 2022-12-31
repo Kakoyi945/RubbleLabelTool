@@ -6,12 +6,16 @@ import com.label.rubblelabeltool.entity.PointsEntity;
 import com.label.rubblelabeltool.util.ex.ImageNotFoundException;
 import com.label.rubblelabeltool.util.ex.MatEmptyException;
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.DataBufferByte;
 import java.io.*;
 import java.net.URL;
@@ -22,7 +26,8 @@ import java.util.Objects;
 
 public class CvTools {
     /**
-     * 表示行、列的缩放尺寸
+     * rowScaler: y轴缩放比例
+     * colScaler: x轴缩放比例
      */
     private static Double rowScaler;
     private static Double colScaler;
@@ -34,19 +39,10 @@ public class CvTools {
      * @param times 倍数
      */
     public static void calScaler(Double width, Double height, Integer times) {
-        rowScaler = (times == 0) ? width : width/times;
-        colScaler = (times == 0) ? height : height/times;
+        colScaler = (times == 0) ? width : width/times;
+        rowScaler = (times == 0) ? height : height/times;
     }
 
-//    /**
-//     * 加载opencv库的dll文件
-//     */
-//    static {
-//        System.setProperty("java.awt.headless", "false");
-//        System.out.println(System.getProperty("java.library.path"));
-//        URL url = ClassLoader.getSystemResource("dlls/opencv_java460.dll");
-//        System.load(url.getPath());
-//    }
 
     /**
      * 根据点集生成图片
@@ -62,10 +58,12 @@ public class CvTools {
             for(int i = 0; i < mops.size(); i++) {
                 Imgproc.drawContours(mat, mops, i, new Scalar(255), Imgproc.FILLED);
             }
+//            Imgproc.fillPoly(mat, mops, new Scalar(255), Imgproc.FILLED);
         } else {
             for(int i = 0; i < mops.size(); i++) {
-                Imgproc.drawContours(mat, mops, i, new Scalar(255,255,255), Imgproc.FILLED);
+                Imgproc.drawContours(mat, mops, i, new Scalar(255, 255, 255, 255), Imgproc.FILLED);
             }
+//            Imgproc.fillPoly(mat, mops, new Scalar(255,255,255,255), Imgproc.FILLED);
         }
     }
 
@@ -87,8 +85,8 @@ public class CvTools {
             List<Point> pts = new LinkedList<>();
             for(int i = 0; i < rowPoints.size(); i++) {
                 // 将坐标进行放缩
-                Double colPoint = colPoints.get(i) * colScaler;
-                Double rowPoint = rowPoints.get(i) * rowScaler;
+                double colPoint = colPoints.get(i) * colScaler;
+                double rowPoint = rowPoints.get(i) * rowScaler;
                 Point point = new Point(colPoint, rowPoint);
                 pts.add(point);
             }
@@ -107,34 +105,58 @@ public class CvTools {
         if(image == null) {
             throw new ImageNotFoundException("生成图片矩阵时发生错误：图片不存在");
         }
-        Integer cvType = 0;
+        // Integer cvType = 0;
+        Mat mat;
         switch (image.getType()) {
             case BufferedImage.TYPE_3BYTE_BGR:
-                BufferedImage rgbImage = convertTo3ByteRGBType(image);
-                cvType = CvType.CV_8UC3;
+                mat = bgrToMat(image);
                 break;
             case BufferedImage.TYPE_INT_RGB:
-                cvType = CvType.CV_8UC3;
+                BufferedImage bgr = convertToBGRType(image);
+                mat = bgrToMat(bgr);
                 break;
             case BufferedImage.TYPE_INT_ARGB:
-                cvType = CvType.CV_8UC4;
-                break;
             case BufferedImage.TYPE_INT_ARGB_PRE:
-                cvType = CvType.CV_8UC4;
+                mat = abgrToMat(convertToBGRType(image));
                 break;
             case BufferedImage.TYPE_BYTE_GRAY:
-                cvType = CvType.CV_8UC1;
+                mat = grayToMat(image);
+                break;
+            case BufferedImage.TYPE_4BYTE_ABGR:
+                mat = abgrToMat(image);
                 break;
             default:
-                cvType = -1;
+                return null;
         }
-        if(cvType == -1) {
-            return null;
-        }
-        Mat mat = new Mat(image.getHeight(), image.getWidth(), cvType);
+        return mat;
+    }
+
+    private static Mat grayToMat(BufferedImage image){
+        Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC1);
         byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         mat.put(0,0,data);
-        System.out.println(mat.size());
+        return mat;
+    }
+
+    private static Mat abgrToMat(BufferedImage image){
+        // 转化为bgra
+        Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC4);
+        byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        for(int i = 0; i < data.length; i += 4){
+            byte tmp = data[i];
+            data[i] = data[i+1];
+            data[i+1] = data[i+2];
+            data[i+2] = data[i+3];
+            data[i+3] = tmp;
+        }
+        mat.put(0,0,data);
+        return mat;
+    }
+
+    private static Mat bgrToMat(BufferedImage image){
+        Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
+        byte[] data = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        mat.put(0,0,data);
         return mat;
     }
 
@@ -157,27 +179,26 @@ public class CvTools {
     }
 
     /**
-     * 将rgb的图片转化为bgr
+     * 将argb/rgb的图片转化为abgr/bgr
      * @param image
      * @return
      */
-    public static BufferedImage convertTo3ByteBGRType(BufferedImage image) {
-        BufferedImage convertedImage = new BufferedImage(image.getWidth(),image.getHeight(),
-                BufferedImage.TYPE_3BYTE_BGR);
-        convertedImage.getGraphics().drawImage(image, 0, 0, null);
-        return convertedImage;
-    }
-
-    /**
-     * 将
-     * @param image
-     * @return
-     */
-    public static BufferedImage convertTo3ByteRGBType(BufferedImage image) {
-        BufferedImage convertedImage = new BufferedImage(image.getWidth(),image.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
-        convertedImage.getGraphics().drawImage(image, 0, 0, null);
-        return convertedImage;
+    public static BufferedImage convertToBGRType(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        // 获取图片中每个rgb像素的int类型表示
+        int[] rgbPixels = image.getRGB(0, 0, width, height, null, 0, width);
+        int[] bgrPixels = new int[rgbPixels.length];
+        for (int i = 0; i < rgbPixels.length; i++) {
+            int color = rgbPixels[i];
+            int red = ((color & 0x00FF0000) >> 16);
+            int green = ((color & 0x0000FF00) >> 8);
+            int blue = color & 0x000000FF;
+            // 将rgb三个通道的数值合并为一个int数值，同时调换b通道和r通道
+            bgrPixels[i] = (red & 0x000000FF) | (green << 8 & 0x0000FF00) | (blue << 16 & 0x00FF0000);
+        }
+        image.setRGB(0, 0, width, height, bgrPixels, 0, width);
+        return image;
     }
 
     /**

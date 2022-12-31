@@ -309,18 +309,6 @@ public class ImageController extends BaseController{
             pointsDataBodyList.add(pointsData);
         }
         initialization.setPointsData(pointsDataBodyList);
-//        List<List<Double[]>> pointsList = new ArrayList<>();
-//        List<Integer> pointsIds = new ArrayList<>();
-//        for(PointsEntity points: oldPointsList){
-//            Integer id = points.getId();
-//            pointsIds.add(id);
-//            // 将str类型的点集转化位List
-//            JSONArray array = JSONArray.parseArray(points.getPointsStr());
-//            List<Double[]> pointList = array.toJavaList(Double[].class);
-//            pointsList.add(pointList);
-//        }
-//        initialization.setPoints(pointsList);
-//        initialization.setPids(pointsIds);
         return new JsonResult<InitializationBody>(OK, initialization);
     }
 
@@ -492,7 +480,7 @@ public class ImageController extends BaseController{
                 out.putNextEntry(new ZipEntry(imageInfo.getFileName() + ImageConfigurer.getImgSuffix(imageInfo.getType())));
                 // 读取需要下载的文件内容，打包到zip中
                 String imgPath = ImagePathUtils.getImagePathByMode(imageInfo, imgModeInt);
-                System.out.println(imgPath);
+//                System.out.println(imgPath);
                 File file = new File(imgPath);
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 out.write(bytes);
@@ -569,7 +557,7 @@ public class ImageController extends BaseController{
         } catch (IOException e) {
             throw new FileEmptyException("文件不存在");
         }
-        System.out.println(pointsList.toString());
+//        System.out.println(pointsList.toString());
         ImageEntity newImage = iImageService.changeImage(image, pointsList);
         ChangeBody changeBody = getChangeBody(newImage, pids);
         // 更新缓存
