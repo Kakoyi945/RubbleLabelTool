@@ -92,4 +92,18 @@ public interface IImageService {
      * @return
      */
     List<ImageInfoEntity> getImageInfosByIdList(List<Integer> idList);
+
+    /**
+     * 根据图片模式获取图片数
+     * @param imgMode
+     * @return
+     */
+    Integer getTotalCountByImgMode(Integer imgMode);
+
+    /**
+     * 根据图片id删除标注图片
+     * @param imgId
+     * @return
+     */
+    Integer dislabelImageById(Integer imgId);
 }

@@ -131,11 +131,30 @@ public class IImageServiceImpl implements IImageService {
 
     @Override
     public Integer deleteImageInfoById(Integer id) {
-        return imageInfoMapper.deleteImageById(id);
+        Integer rows = imageInfoMapper.deleteImageById(id);
+        if(rows != 1){
+            throw new UpdateImageInfoFailedException("删除文件信息失败");
+        }
+        return rows;
     }
 
     @Override
     public List<ImageInfoEntity> getImageInfosByIdList(List<Integer> idList) {
         return imageInfoMapper.queryImageInfosByIdList(idList);
     }
+
+    @Override
+    public Integer getTotalCountByImgMode(Integer imgMode) {
+        return imageInfoMapper.queryTotalCountByImgMode(imgMode);
+    }
+
+    @Override
+    public Integer dislabelImageById(Integer imgId) {
+        Integer rows = imageInfoMapper.dislabelImageById(imgId);
+        if(rows != 1) {
+            throw new UpdateImageInfoFailedException("删除文件信息失败！");
+        }
+        return rows;
+    }
+
 }

@@ -11,17 +11,7 @@ import java.util.Objects;
 
 @ApiModel(value = "InitializationBody", description = "点击编辑按钮时返回的数据，包括点集、点集id以及四种图像（如果都有的话）")
 public class InitializationBody implements Serializable {
-//    /**
-//     * 点集的id列表
-//     */
-//    @ApiModelProperty(value = "点集id的列表", dataType = "List")
-//    private List<Integer> pids;
-//
-//    /**
-//     * 点集的列表
-//     */
-//    @ApiModelProperty(value = "点集的列表", dataType = "List")
-//    private List<List<Double[]>> points;
+
     /**
      * 点集数据
      */
@@ -35,7 +25,7 @@ public class InitializationBody implements Serializable {
     private String rawRgbImg;
 
     /**
-     * ice图片（可能为初始）
+     * ice图片
      */
     @ApiModelProperty(value = "初始ice图片", dataType = "String")
     private String iceImg;

@@ -114,5 +114,12 @@ public class ImageInfoMapperTest {
             System.out.println(imageInfo.toString());
         }
     }
+
+    @Test
+    public void queryTotalCountByImgModeTest() {
+        Integer imgMode = 1;
+        Integer totals = imageInfoMapper.queryTotalCountByImgMode(imgMode);
+        System.out.println(totals);
+    }
 }
 

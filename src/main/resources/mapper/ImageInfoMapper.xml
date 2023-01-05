@@ -73,7 +73,10 @@
             *
         FROM
             t_img
-        WHERE file_name = #{fileName}
+        WHERE
+            file_name = #{fileName}
+        AND
+            is_deleted = 0
     </select>
 
     <update id="updateRawRgbPathById">
@@ -142,4 +145,26 @@
                 #{imgId}
             </foreach>
     </select>
+
+    <select id="queryTotalCountByImgMode" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            t_img
+        WHERE
+            is_deleted = 0
+        <if test="imgMode == 2 or imgMode == 4">
+            and is_labeled = 1
+        </if>
+    </select>
+
+    <update id="dislabelImageById">
+        UPDATE
+            t_img
+        SET
+            is_labeled = 0
+        WHERE
+            img_id = #{id}
+    </update>
+
 </mapper>

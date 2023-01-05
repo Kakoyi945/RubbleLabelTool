@@ -64,25 +64,35 @@ public class ImageConfigurer {
 
     /**
      * 根据文件类型设置文件路径，如： {bashPath}/{timeStamp}/raw_rgb/xx.png
+     * 或：{bashPath}/{timeStamp}/raw_rgb/xx.png
      * @param imgMode 图片模式（int）
      * @return 文件路径
      */
     public static String getImgDir(Integer imgMode) {
         // String basePath = "D:/project/rubble_detection/data/raw/";
         // String basePath = "/home/ices/labeltool/labeled/";
-        return ServerRealPathUtils.getPath("raw/" + imgPathMap.get(imgMode));
+        String imgPath;
+        if(imgMode == 0 || imgMode == 1)
+            imgPath = ServerRealPathUtils.getPath("raw/" + imgPathMap.get(imgMode));
+        else
+            imgPath = ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
+        return imgPath;
     }
 
-    /**
-     * 根据文件类型设置文件路径，如： {bashPath}/{timeStamp}/raw_rgb/xx.png
-     * @param imgMode
-     * @return
-     */
-    public static String getLabeledImgDir(Integer imgMode) {
-        // String basePath = "D:/project/rubble_detection/data/labeled/";
-        // String basePath = "/home/ices/labeltool/data/labeled/";
-        return ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
-    }
+//    /**
+//     * 根据文件类型设置文件路径，如： {bashPath}/{timeStamp}/raw_rgb/xx.png
+//     * @param imgMode
+//     * @return
+//     */
+//    public static String getLabeledImgDir(Integer imgMode) {
+//        // String basePath = "D:/project/rubble_detection/data/labeled/";
+//        // String basePath = "/home/ices/labeltool/data/labeled/";
+//        String imgPath;
+//        if(imgMode == 0 || imgMode == 1)
+//            imgPath = ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
+//        else
+//            imgPath = ServerRealPathUtils.getPath()
+//    }
 
     /**
      * 获取文件的后缀（如.jpg .png）
@@ -96,6 +106,11 @@ public class ImageConfigurer {
     // public static final String zipDir = "D:/project/rubble_detection/data/tmp/";
     // public static final String zipDir = "/home/ices/labeltool/tmp";
     public static final String zipDir = ServerRealPathUtils.getPath("tmp");
+
+    /**
+     * 文件基地址的url
+     */
+    public static final String zipUrl = "/zip/";
 
     /**
      * 限制上传文件的最大值
