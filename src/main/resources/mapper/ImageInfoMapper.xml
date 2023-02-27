@@ -7,7 +7,6 @@
         <id column="img_id" property="id"/>
         <result column="file_name" property="fileName"/>
         <result column="type" property="type"/>
-        <result column="size" property="size"/>
         <result column="raw_rgb_path" property="rawRgbPath"/>
         <result column="raw_ice_path" property="rawIcePath"/>
         <result column="bi_path" property="biPath"/>
@@ -19,9 +18,9 @@
     </resultMap>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
-            t_img ( raw_rgb_path, file_name, raw_ice_path, bi_path, ice_path, high_path, edit_time, is_deleted, is_labeled, type, size)
+            t_img ( raw_rgb_path, file_name, raw_ice_path, bi_path, ice_path, high_path, edit_time, is_deleted, is_labeled, type)
         VALUES 
-            ( #{rawRgbPath}, #{fileName}, #{rawIcePath},  #{biPath}, #{icePath}, #{highLightPath}, #{editTime}, #{isDeleted}, #{isLabeled}, #{type}, #{size} )
+            ( #{rawRgbPath}, #{fileName}, #{rawIcePath},  #{biPath}, #{icePath}, #{highLightPath}, #{editTime}, #{isDeleted}, #{isLabeled}, #{type})
     </insert>
     
     <select id="queryById" resultMap="ImageInfoMap">
@@ -53,8 +52,6 @@
             bi_path = #{biPath}, ice_path = #{icePath}, high_path = #{highLightPath}, edit_time = #{labeledTime}, is_labeled = 1
         WHERE
             img_id = #{id}
-        AND
-            is_deleted = 0
     </update>
 
     <select id="queryImageIdByImageName" resultType="java.lang.Integer">
@@ -108,6 +105,18 @@
             t_img
         WHERE
             is_deleted = 0
+        AND
+        <choose>
+            <when test="imgMode == 0">
+                raw_rgb_path != ''
+            </when>
+            <when test="imgMode == 1">
+                raw_ice_path != ''
+            </when>
+            <otherwise>
+                is_labeled = 1
+            </otherwise>
+        </choose>
         ORDER BY
             img_id DESC
         <if test="page != null and limit != null">
@@ -153,9 +162,18 @@
             t_img
         WHERE
             is_deleted = 0
-        <if test="imgMode == 2 or imgMode == 4">
-            and is_labeled = 1
-        </if>
+        AND
+        <choose>
+            <when test="imgMode == 0">
+                raw_rgb_path != ''
+            </when>
+            <when test="imgMode == 1">
+                raw_ice_path != ''
+            </when>
+            <otherwise>
+                is_labeled = 1
+            </otherwise>
+        </choose>
     </select>
 
     <update id="dislabelImageById">

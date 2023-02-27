@@ -24,7 +24,7 @@ public class IImageServiceImpl implements IImageService {
     ImageInfoMapper imageInfoMapper;
 
     @Override
-    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, Double size, String type) {
+    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, String type) {
         ImgMode imgMode = ImageConfigurer.getImgMode(imgModeInt);
         if(imgMode != ImgMode.RAWICE && imgMode != ImgMode.RAWRGB) {
             throw new ImageModeUnsatisfiedException("所传送的图片不是规定的类型，需求类型为原始的ice或者rgb，实际类型为" + imgMode);
@@ -33,7 +33,6 @@ public class IImageServiceImpl implements IImageService {
         ImageInfoEntity imageInfo = new ImageInfoEntity();
         imageInfo.setEditTime(uploadTime);
         imageInfo.setFileName(imageName);
-        imageInfo.setSize(size);
         imageInfo.setType(type);
         if(imgMode == ImgMode.RAWRGB) {
             imageInfo.setRawRgbPath(path);

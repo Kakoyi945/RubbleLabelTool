@@ -1,6 +1,13 @@
 package com.label.rubblelabeltool.util;
 
+import com.label.rubblelabeltool.controller.ex.DeleteFileFailedException;
+import com.label.rubblelabeltool.util.ex.FileInfoErrorException;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,26 +51,29 @@ public class FileUtils {
 
     /**
      * 递归获取目录大小
-     * @Title: getFileSize
+     * @Title: getDirSize
      * @param f
      * @return long 目录大小
      * @author projectNo
-     * @throws Exception
      *
      */
-    public static long getFileSize(File f)throws Exception
+    public static long getDirSize(File f)
     {
         long size = 0;
-        File flist[] = f.listFiles();
-        for (int i = 0; i < flist.length; i++)
-        {
-            if (flist[i].isDirectory())
+        try{
+            File flist[] = f.listFiles();
+            for (int i = 0; i < flist.length; i++)
             {
-                size = size + getFileSize(flist[i]);
-            } else
-            {
-                size = size + flist[i].length();
+                if (flist[i].isDirectory())
+                {
+                    size = size + getDirSize(flist[i]);
+                } else
+                {
+                    size = size + flist[i].length();
+                }
             }
+        } catch (Exception e){
+            throw new FileInfoErrorException("获取文件夹大小时发生错误！");
         }
         return size;
     }
@@ -92,4 +102,16 @@ public class FileUtils {
         return fileSizeString;
     }
 
+    /**
+     * 根据文件路径删除文件
+     * @param fileUrl 文件路径
+     */
+    public static void deleteFile(String fileUrl){
+        try{
+            Path path = Paths.get(fileUrl);
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new DeleteFileFailedException("删除文件失败");
+        }
+    }
 }

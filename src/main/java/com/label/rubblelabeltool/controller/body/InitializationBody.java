@@ -42,6 +42,7 @@ public class InitializationBody implements Serializable {
     @ApiModelProperty(value = "高亮图", dataType = "String")
     private String highLightImg;
 
+
     public List<PointsDataBody> getPointsData() {
         return pointsData;
     }
@@ -106,76 +107,4 @@ public class InitializationBody implements Serializable {
                 '}';
     }
 
-    //    public List<Integer> getPids() {
-//        return pids;
-//    }
-//
-//    public void setPids(List<Integer> pids) {
-//        this.pids = pids;
-//    }
-//
-//    public List<List<Double[]>> getPoints() {
-//        return points;
-//    }
-//
-//    public void setPoints(List<List<Double[]>> points) {
-//        this.points = points;
-//    }
-//
-//    public String getRawRgbImg() {
-//        return rawRgbImg;
-//    }
-//
-//    public void setRawRgbImg(String rawRgbImg) {
-//        this.rawRgbImg = rawRgbImg;
-//    }
-//
-//    public String getIceImg() {
-//        return iceImg;
-//    }
-//
-//    public void setIceImg(String iceImg) {
-//        this.iceImg = iceImg;
-//    }
-//
-//    public String getBiImg() {
-//        return biImg;
-//    }
-//
-//    public void setBiImg(String biImg) {
-//        this.biImg = biImg;
-//    }
-//
-//    public String getHighLightImg() {
-//        return highLightImg;
-//    }
-//
-//    public void setHighLightImg(String highLightImg) {
-//        this.highLightImg = highLightImg;
-//    }
-//
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (!(o instanceof InitializationBody)) return false;
-//        InitializationBody that = (InitializationBody) o;
-//        return Objects.equals(pids, that.pids) && Objects.equals(points, that.points) && Objects.equals(rawRgbImg, that.rawRgbImg) && Objects.equals(iceImg, that.iceImg) && Objects.equals(biImg, that.biImg) && Objects.equals(highLightImg, that.highLightImg);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(pids, points, rawRgbImg, iceImg, biImg, highLightImg);
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return "InitializationBody{" +
-//                "pids=" + pids +
-//                ", points=" + points +
-//                ", rawRgbImg='" + rawRgbImg + '\'' +
-//                ", iceImg='" + iceImg + '\'' +
-//                ", biImg='" + biImg + '\'' +
-//                ", highLightImg='" + highLightImg + '\'' +
-//                '}';
-//    }
 }

@@ -206,7 +206,7 @@ public class CvTools {
      * @param mat 矩阵
      * @return String base64格式文件
      */
-    public static String matToBase64(Mat mat, String imgType){
+    public static String MatToBase64(Mat mat, String imgType){
         imgType = "." + imgType;
         MatOfByte mob = new MatOfByte();
         Imgcodecs.imencode(imgType, mat, mob);

@@ -50,6 +50,11 @@ public class ImageConfigurer {
     }
 
     /**
+     * 设置图片默认格式为 png
+     */
+    public static String DEFAULT_IMAGE_TYPE = "png";
+
+    /**
      * 根据bufferedImage的type类型获得字符串形式
      * @param bufferedImageType
      * @return
