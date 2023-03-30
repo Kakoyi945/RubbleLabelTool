@@ -64,7 +64,7 @@ public class ImageController extends BaseController{
             directoryBody.setDirId(i);
             ImgMode imgMode = ImageConfigurer.getImgMode(i);
             directoryBody.setDirName(imgMode.name());
-            String imgDirStr = ImageConfigurer.getImgDir(i);
+            String imgDirStr = ImageConfigurer.getImgDir(i, "");
             // 获取修改时间和文件夹大小
             String fileTime = FileUtils.getFileTime(imgDirStr);
             File imgDir = new File(imgDirStr);
@@ -112,24 +112,32 @@ public class ImageController extends BaseController{
             if (!ImageConfigurer.IMAGE_TYPE.contains(contentType)) {
                 throw new FileTypeException("不支持使用该类型的图片");
             }
+            // 获取图片名字以及二级路径（即日期）
             String imageName = image.getOriginalFilename().substring(0, image.getOriginalFilename().lastIndexOf("."));
+            String[] strs = imageName.split("_");
+            if(strs.length < 6) {
+                throw new FileStateException("文件名不符合要求");
+            }
+            // fileName为保存于数据库中的图片的名字，即截取实际图片名字的日期加时间部分，如：20200101_3000
+            String fileName = strs[4]+"_"+strs[5];
+            String secDir = strs[4];
 
             String suffix = ImageConfigurer.getImgSuffix(contentType);
             String dirPath = null;
             if(suffix == null) {
                 throw new FileStateException("文件后缀名为空或不符合要求");
             }
-            ImageInfoEntity imageInfo = iImageService.getImageInfoByFileName(imageName);
+            ImageInfoEntity imageInfo = iImageService.getImageInfoByFileName(fileName);
             // 若图片信息为空，说明是新上传的文件，则使用insert，否则使用update
             if(imageInfo == null) {
                 // 获取上传日期
                 Date uploadTime = new Date();
-                // 获取文件夹，例如：{basepath}/raw/raw_rgb/xx.png
-                dirPath = ImageConfigurer.getImgDir(imgModeInt);
+                // 获取文件夹，例如：{basepath}/rgb/20200101/
+                dirPath = ImageConfigurer.getImgDir(imgModeInt, secDir);
                 // 更新数据库
-                iImageService.uploadImage(imageName, uploadTime, imgModeInt, dirPath + imageName + suffix, contentType);
+                iImageService.uploadImage(fileName, uploadTime, imgModeInt, dirPath + imageName + suffix, contentType);
             } else {
-                dirPath = ImageConfigurer.getImgDir(imgModeInt);
+                dirPath = ImageConfigurer.getImgDir(imgModeInt, secDir);
                 // 更新数据库
                 iImageService.updateImage(imageInfo, dirPath + imageName + suffix, imgModeInt);
             }
@@ -148,7 +156,7 @@ public class ImageController extends BaseController{
                 throw new FileUploadIOException("文件保存失败");
             }
             // 获取图像的id，保存到list中
-            ImageInfoEntity lastImageInfo = iImageService.getImageInfoByFileName(imageName);
+            ImageInfoEntity lastImageInfo = iImageService.getImageInfoByFileName(fileName);
             imgIdList.add(lastImageInfo.getId());
         }
         return new ListResult<Integer>(OK, imgIdList);
@@ -222,7 +230,7 @@ public class ImageController extends BaseController{
             File image = new File(imagePath);
             PageEntryBody pageEntry = new PageEntryBody();
             pageEntry.setImgId(imageInfo.getId());
-            pageEntry.setFileName(imageInfo.getFileName());
+            pageEntry.setFileName(image.getName());
             Double fileSize = (double)FileUtils.getFileSizes(image);
             pageEntry.setSize(fileSize);
             pageEntry.setType(imageInfo.getType());
@@ -422,17 +430,19 @@ public class ImageController extends BaseController{
      * @return
      */
     private ChangeBody getChangeBody(ImageEntity image, List<Integer> pids) {
+
+        ChangeBody changeBody = new ChangeBody();
         // highlight
         Mat highLightMat = image.getHighLightImg();
-        // 将图片以base64编码格式转化为json格式数据返回
-        ChangeBody changeBody = new ChangeBody();
-        // ice
-        Mat iceMat = image.getIceImg();
-        String iceStr = CvTools.MatToBase64(iceMat, "png");
-        changeBody.setIceImg(iceStr);
+        String highLightStr = CvTools.MatToBase64(highLightMat, ImageConfigurer.DEFAULT_IMAGE_TYPE);
+        changeBody.setHighLightImg(highLightStr);
+//        // ice
+//        Mat iceMat = image.getIceImg();
+//        String iceStr = CvTools.MatToBase64(iceMat, "png");
+//        changeBody.setIceImg(iceStr);
         // binary
         Mat biMat = image.getBiImg();
-        String biStr = CvTools.MatToBase64(biMat, "png");
+        String biStr = CvTools.MatToBase64(biMat, ImageConfigurer.DEFAULT_IMAGE_TYPE);
         changeBody.setBiImg(biStr);
         // 将点集id的集合存到changeBody中
         changeBody.setPids(pids);
@@ -442,18 +452,20 @@ public class ImageController extends BaseController{
         // 获取标注时间
         Date labeledTime = new Date();
         String suffix = ".png";
-        // 保存ice
-        String iceDirPath = ImageConfigurer.getImgDir(ImageConfigurer.ICE);
-        // 创建文件夹
-        File iceFolder = new File(iceDirPath);
-        if(!iceFolder.exists()) {
-            iceFolder.mkdirs();
-        }
-        if(!Imgcodecs.imwrite(iceDirPath + fileName + suffix, iceMat) ) {
-            throw new FileUploadIOException("文件保存失败");
-        }
+        // 获取二级路径
+        String secDir = fileName.split("_")[0];
+//        // 保存ice
+//        String iceDirPath = ImageConfigurer.getImgDir(ImageConfigurer.ICE);
+//        // 创建文件夹
+//        File iceFolder = new File(iceDirPath);
+//        if(!iceFolder.exists()) {
+//            iceFolder.mkdirs();
+//        }
+//        if(!Imgcodecs.imwrite(iceDirPath + fileName + suffix, iceMat) ) {
+//            throw new FileUploadIOException("文件保存失败");
+//        }
         // 保存binary
-        String biDirPath = ImageConfigurer.getImgDir(ImageConfigurer.BINARY);
+        String biDirPath = ImageConfigurer.getImgDir(ImageConfigurer.BINARY, secDir);
         // 创建文件夹
         File biFolder = new File(biDirPath);
         if(!biFolder.exists()) {
@@ -463,7 +475,7 @@ public class ImageController extends BaseController{
             throw new FileUploadIOException("文件保存失败");
         };
         // 保存high_light
-        String highLightDirPath = ImageConfigurer.getImgDir(ImageConfigurer.HIGHLIGHT);
+        String highLightDirPath = ImageConfigurer.getImgDir(ImageConfigurer.HIGHLIGHT, secDir);
         // 创建文件夹
         File highLightFolder = new File(highLightDirPath);
         if(!highLightFolder.exists()) {
@@ -474,7 +486,7 @@ public class ImageController extends BaseController{
         }
         // 将信息填入数据库
         iImageService.storeImageInfo(image.getId(), biDirPath + fileName + suffix,
-                iceDirPath + fileName + suffix, highLightDirPath + fileName + suffix, labeledTime);
+                "", highLightDirPath + fileName + suffix, labeledTime);
         return changeBody;
     }
 
@@ -486,7 +498,7 @@ public class ImageController extends BaseController{
      * 请求结果： JsonResult<ChangeBody>
      */
     @PostMapping("submit")
-    @ApiOperation("获取上传的点集，经过处理后得到黑白图、高亮图和冰雪覆盖图并使用json格式回传。调试该接口时，需先调试edit，使得后端有该图片的缓存")
+    @ApiOperation("获取上传的点集，经过处理后得到黑白图、高亮图并使用json格式回传。")
     public JsonResult<ChangeBody> submitImage(@RequestBody PointsEntriesBody pointsEntriesBody,
                                               HttpSession session) {
 //        ImageEntity image = (ImageEntity)session.getAttribute("imageCache");
@@ -561,6 +573,8 @@ public class ImageController extends BaseController{
                 FileUtils.deleteFile(highLightPath);
             }
         }
+        // 无论删除什么类型的图片，都需要删除对应的点集
+        iPointsService.deletePointsByImgId(imgId);
 //        Integer page = (Integer) session.getAttribute("page");
 //        Integer limit = (Integer) session.getAttribute("limit");
 //        Integer isPaged = (Integer) session.getAttribute("is_paged");
@@ -597,10 +611,12 @@ public class ImageController extends BaseController{
             ServletOutputStream outputStream = response.getOutputStream();
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(strZipPath));
             for(ImageInfoEntity imageInfo : imageInfos){
-                out.putNextEntry(new ZipEntry(imageInfo.getFileName() + ImageConfigurer.getImgSuffix(imageInfo.getType())));
+                // out.putNextEntry(new ZipEntry(imageInfo.getFileName() + ImageConfigurer.getImgSuffix(imageInfo.getType())));
                 // 读取需要下载的文件内容，打包到zip中
                 String imgPath = getImagePathByMode(imageInfo, imgModeInt);
                 File file = new File(imgPath);
+                String fileName = file.getName();
+                out.putNextEntry(new ZipEntry(fileName));
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 out.write(bytes);
                 out.closeEntry();

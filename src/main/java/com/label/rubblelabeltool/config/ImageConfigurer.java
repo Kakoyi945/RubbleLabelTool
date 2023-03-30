@@ -8,10 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ImageConfigurer {
@@ -68,19 +65,26 @@ public class ImageConfigurer {
     }
 
     /**
-     * 根据文件类型设置文件路径，如： {bashPath}/{timeStamp}/raw_rgb/xx.png
-     * 或：{bashPath}/{timeStamp}/raw_rgb/xx.png
+     * 根据文件类型设置文件路径，
+     * 若未给secDir，则显示到一级路径，如： {bashPath}/rgb
+     * 若给了secDir，则显示到二级路径，如： {bashPath}/rgb/20200101/
      * @param imgMode 图片模式（int）
+     * @param secDir  图片二级路径，即日期(string)
      * @return 文件路径
      */
-    public static String getImgDir(Integer imgMode) {
+    public static String getImgDir(Integer imgMode, String secDir) {
         // String basePath = "D:/project/rubble_detection/data/raw/";
         // String basePath = "/home/ices/labeltool/labeled/";
         String imgPath;
-        if(imgMode == 0 || imgMode == 1)
-            imgPath = ServerRealPathUtils.getPath("raw/" + imgPathMap.get(imgMode));
-        else
-            imgPath = ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
+        if(Objects.equals(secDir, "")){
+            imgPath = ServerRealPathUtils.getPath(imgPathMap.get(imgMode));
+        } else {
+            imgPath = ServerRealPathUtils.getPath(imgPathMap.get(imgMode) + "/" + secDir + "/");
+        }
+//        if(imgMode == 0 || imgMode == 1)
+//            imgPath = ServerRealPathUtils.getPath("raw/" + imgPathMap.get(imgMode));
+//        else
+//            imgPath = ServerRealPathUtils.getPath("labeled/" + imgPathMap.get(imgMode));
         return imgPath;
     }
 
@@ -115,7 +119,7 @@ public class ImageConfigurer {
     /**
      * 文件基地址的url
      */
-    public static final String zipUrl = "/zip/";
+    public static final String zipUrl = "zip/";
 
     /**
      * 限制上传文件的最大值
@@ -153,8 +157,8 @@ public class ImageConfigurer {
         imgModeMap.put(3, "ICE");
         imgModeMap.put(4, "HIGHLIGHT");
         // 初始化 imgPathMap，只设置文件的上一级文件夹
-        imgPathMap.put(0, "raw_rgb/");
-        imgPathMap.put(1, "raw_ice/");
+        imgPathMap.put(0, "rgb/");
+        imgPathMap.put(1, "lc/");
         imgPathMap.put(2, "binary/");
         imgPathMap.put(3, "ice/");
         imgPathMap.put(4, "high_light/");

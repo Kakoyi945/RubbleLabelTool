@@ -60,11 +60,11 @@ public class IImageServiceImpl implements IImageService {
             biImg = new Mat(image.getRawRgbImg().size(), CvType.CV_8UC1, new Scalar(0));
             image.setBiImg(biImg);
         }
-        // iceImg
-        Mat iceImg = image.getIceImg();
-        if(iceImg == null) {
-            iceImg = image.getRawIceImg();
-        }
+//        // iceImg
+//        Mat iceImg = image.getIceImg();
+//        if(iceImg == null) {
+//            iceImg = image.getRawIceImg();
+//        }
         // highLightImg
         Mat highLightImg = image.getHighLightImg();
         if(highLightImg == null) {
@@ -73,7 +73,7 @@ public class IImageServiceImpl implements IImageService {
         // 如果传入的点集为空，则填充全部图像并返回
         if(ptes.size() == 0) {
             image.setBiImg(biImg);
-            image.setIceImg(iceImg);
+//            image.setIceImg(iceImg);
             image.setHighLightImg(highLightImg);
             return image;
         }
@@ -84,9 +84,9 @@ public class IImageServiceImpl implements IImageService {
         // 填充点集圈出来的区域
         CvTools.fillArea(biImg, mops, ImgMode.BINARY);
         image.setBiImg(biImg);
-        // 由于一开始以为冰雪覆盖图也需要标注，所以添加了iceImg的字段，为了省事，直接把标注冰雪覆盖图代码注释了
-        // CvTools.fillArea(iceImg, mops, ImgMode.ICE);
-        image.setIceImg(iceImg);
+        // 由于一开始以为冰雪覆盖图也需要标注，所以添加了iceImg的字段
+//        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
+//        image.setIceImg(iceImg);
         CvTools.fillArea(highLightImg, mops, ImgMode.HIGHLIGHT);
         image.setHighLightImg(highLightImg);
         return image;
