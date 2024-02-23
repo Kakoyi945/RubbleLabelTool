@@ -91,6 +91,7 @@ public class ImageInfoMapperTest {
         Map<String, Object> pageInfoMap = new HashMap<>();
         pageInfoMap.put("page", 1);
         pageInfoMap.put("limit", 4);
+        pageInfoMap.put("imgMode", 0);
         PageUtils pageUtils = new PageUtils(pageInfoMap, 1);
         List<ImageInfoEntity> imageInfos = imageInfoMapper.queryImageInfos(pageUtils);
         for(ImageInfoEntity imageInfo: imageInfos){
@@ -113,6 +114,13 @@ public class ImageInfoMapperTest {
         for(ImageInfoEntity imageInfo : imageInfos) {
             System.out.println(imageInfo.toString());
         }
+    }
+
+    @Test
+    public void queryTotalCountByImgModeTest() {
+        Integer imgMode = 2;
+        Integer totals = imageInfoMapper.queryTotalCountByImgMode(imgMode);
+        System.out.println(totals);
     }
 }
 

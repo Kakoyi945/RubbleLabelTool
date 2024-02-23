@@ -39,4 +39,11 @@ public interface PointsMapper {
      * @return
      */
     Integer deletePointsById(Integer id);
+
+    /**
+     * 通过图片id删除点集
+     * @param imgId
+     * @return
+     */
+    Integer deletePointsByImgId(Integer imgId);
 }

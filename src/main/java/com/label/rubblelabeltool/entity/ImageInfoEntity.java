@@ -44,10 +44,6 @@ public class ImageInfoEntity extends BaseEntity{
      */
     private Date editTime;
     /**
-     * 图片大小
-     */
-    private Double size;
-    /**
      * 图片类型
      */
     private String type;
@@ -124,14 +120,6 @@ public class ImageInfoEntity extends BaseEntity{
         this.editTime = editTime;
     }
 
-    public Double getSize() {
-        return size;
-    }
-
-    public void setSize(Double size) {
-        this.size = size;
-    }
-
     public String getType() {
         return type;
     }
@@ -146,12 +134,12 @@ public class ImageInfoEntity extends BaseEntity{
         if (!(o instanceof ImageInfoEntity)) return false;
         if (!super.equals(o)) return false;
         ImageInfoEntity imageInfo = (ImageInfoEntity) o;
-        return Objects.equals(getId(), imageInfo.getId()) && Objects.equals(getFileName(), imageInfo.getFileName()) && isLabeled == imageInfo.isLabeled && Objects.equals(rawRgbPath, imageInfo.rawRgbPath) && Objects.equals(rawIcePath, imageInfo.rawIcePath) && Objects.equals(rgbPath, imageInfo.rgbPath) && Objects.equals(biPath, imageInfo.biPath) && Objects.equals(icePath, imageInfo.icePath) && Objects.equals(highLightPath, imageInfo.highLightPath) && Objects.equals(editTime, imageInfo.editTime) && Objects.equals(size, imageInfo.size) && Objects.equals(type, imageInfo.type);
+        return Objects.equals(getId(), imageInfo.getId()) && Objects.equals(getFileName(), imageInfo.getFileName()) && isLabeled == imageInfo.isLabeled && Objects.equals(rawRgbPath, imageInfo.rawRgbPath) && Objects.equals(rawIcePath, imageInfo.rawIcePath) && Objects.equals(rgbPath, imageInfo.rgbPath) && Objects.equals(biPath, imageInfo.biPath) && Objects.equals(icePath, imageInfo.icePath) && Objects.equals(highLightPath, imageInfo.highLightPath) && Objects.equals(editTime, imageInfo.editTime) && Objects.equals(type, imageInfo.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), rawRgbPath, rawIcePath, rgbPath, biPath, icePath, highLightPath, isLabeled, editTime, size, type);
+        return Objects.hash(super.hashCode(), rawRgbPath, rawIcePath, rgbPath, biPath, icePath, highLightPath, isLabeled, editTime, type);
     }
 
     @Override
@@ -167,7 +155,6 @@ public class ImageInfoEntity extends BaseEntity{
                 ", highLightPath='" + highLightPath + '\'' +
                 ", isLabeled=" + isLabeled +
                 ", editTime=" + editTime +
-                ", size=" + size +
                 ", type='" + type + '\'' +
                 '}';
     }

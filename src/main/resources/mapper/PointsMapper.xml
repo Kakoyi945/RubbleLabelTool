@@ -57,4 +57,13 @@
         WHERE
             pid = #{id}
     </delete>
+
+    <delete id="deletePointsByImgId" >
+        UPDATE
+        t_points
+        SET
+        is_deleted = 1
+        WHERE
+        img_id = #{imgId}
+    </delete>
 </mapper>

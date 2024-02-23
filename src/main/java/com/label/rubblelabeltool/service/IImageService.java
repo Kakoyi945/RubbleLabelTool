@@ -24,11 +24,10 @@ public interface IImageService {
      * @param uploadTime 上传日期
      * @param imgModeInt 图片模式(int)
      * @param path 文件保存路径
-     * @param size 文件大小
      * @param type 文件类型
      * @return 受影响的行数
      */
-    Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, Double size, String type);
+    Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, String type);
 
     /**
      * 补充imageInfo，主要是图片路径
@@ -92,4 +91,18 @@ public interface IImageService {
      * @return
      */
     List<ImageInfoEntity> getImageInfosByIdList(List<Integer> idList);
+
+    /**
+     * 根据图片模式获取图片数
+     * @param imgMode
+     * @return
+     */
+    Integer getTotalCountByImgMode(Integer imgMode);
+
+    /**
+     * 根据图片id删除标注图片
+     * @param imgId
+     * @return
+     */
+    Integer dislabelImageById(Integer imgId);
 }

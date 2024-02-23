@@ -55,4 +55,9 @@ public class IPointsServiceImpl implements IPointsService {
     public Integer deletePointsById(Integer id) {
         return pointsMapper.deletePointsById(id);
     }
+
+    @Override
+    public Integer deletePointsByImgId(Integer imgId) {
+        return pointsMapper.deletePointsByImgId(imgId);
+    }
 }

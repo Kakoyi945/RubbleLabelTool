@@ -28,6 +28,8 @@ public class ChangeBody implements Serializable {
     @ApiModelProperty(value = "标注后的冰雪覆盖图", dataType = "String")
     private String iceImg;
 
+    @ApiModelProperty(value = "标注后的高亮图", dataType = "String")
+    private String highLightImg;
 
     public List<Integer> getPids() {
         return pids;
@@ -53,17 +55,25 @@ public class ChangeBody implements Serializable {
         this.iceImg = iceImg;
     }
 
+    public String getHighLightImg() {
+        return highLightImg;
+    }
+
+    public void setHighLightImg(String highLightImg) {
+        this.highLightImg = highLightImg;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ChangeBody)) return false;
         ChangeBody that = (ChangeBody) o;
-        return Objects.equals(pids, that.pids) && Objects.equals(biImg, that.biImg) && Objects.equals(iceImg, that.iceImg);
+        return Objects.equals(pids, that.pids) && Objects.equals(biImg, that.biImg) && Objects.equals(iceImg, that.iceImg) && Objects.equals(highLightImg, that.highLightImg);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pids, biImg, iceImg);
+        return Objects.hash(pids, biImg, iceImg, highLightImg);
     }
 
     @Override
@@ -72,6 +82,7 @@ public class ChangeBody implements Serializable {
                 "pids=" + pids +
                 ", biImg='" + biImg + '\'' +
                 ", iceImg='" + iceImg + '\'' +
+                ", highLightImg='" + highLightImg + '\'' +
                 '}';
     }
 }

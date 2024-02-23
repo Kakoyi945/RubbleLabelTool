@@ -98,4 +98,17 @@ public interface ImageInfoMapper {
      * @return
      */
     List<ImageInfoEntity> queryImageInfosByIdList(List<Integer> idList);
+
+    /**
+     * 获取没有删除的图片数量
+     * @return
+     */
+    Integer queryTotalCountByImgMode(Integer imgMode);
+
+    /**
+     * 根据图片id将标注图片删去
+     * @param id
+     * @return
+     */
+    Integer dislabelImageById(Integer id);
 }

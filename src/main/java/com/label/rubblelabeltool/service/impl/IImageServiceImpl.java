@@ -24,7 +24,7 @@ public class IImageServiceImpl implements IImageService {
     ImageInfoMapper imageInfoMapper;
 
     @Override
-    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, Double size, String type) {
+    public Integer uploadImage(String imageName, Date uploadTime, Integer imgModeInt, String path, String type) {
         ImgMode imgMode = ImageConfigurer.getImgMode(imgModeInt);
         if(imgMode != ImgMode.RAWICE && imgMode != ImgMode.RAWRGB) {
             throw new ImageModeUnsatisfiedException("所传送的图片不是规定的类型，需求类型为原始的ice或者rgb，实际类型为" + imgMode);
@@ -33,7 +33,6 @@ public class IImageServiceImpl implements IImageService {
         ImageInfoEntity imageInfo = new ImageInfoEntity();
         imageInfo.setEditTime(uploadTime);
         imageInfo.setFileName(imageName);
-        imageInfo.setSize(size);
         imageInfo.setType(type);
         if(imgMode == ImgMode.RAWRGB) {
             imageInfo.setRawRgbPath(path);
@@ -61,11 +60,11 @@ public class IImageServiceImpl implements IImageService {
             biImg = new Mat(image.getRawRgbImg().size(), CvType.CV_8UC1, new Scalar(0));
             image.setBiImg(biImg);
         }
-        // iceImg
-        Mat iceImg = image.getIceImg();
-        if(iceImg == null) {
-            iceImg = image.getRawIceImg();
-        }
+//        // iceImg
+//        Mat iceImg = image.getIceImg();
+//        if(iceImg == null) {
+//            iceImg = image.getRawIceImg();
+//        }
         // highLightImg
         Mat highLightImg = image.getHighLightImg();
         if(highLightImg == null) {
@@ -74,7 +73,7 @@ public class IImageServiceImpl implements IImageService {
         // 如果传入的点集为空，则填充全部图像并返回
         if(ptes.size() == 0) {
             image.setBiImg(biImg);
-            image.setIceImg(iceImg);
+//            image.setIceImg(iceImg);
             image.setHighLightImg(highLightImg);
             return image;
         }
@@ -85,8 +84,9 @@ public class IImageServiceImpl implements IImageService {
         // 填充点集圈出来的区域
         CvTools.fillArea(biImg, mops, ImgMode.BINARY);
         image.setBiImg(biImg);
-        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
-        image.setIceImg(iceImg);
+        // 由于一开始以为冰雪覆盖图也需要标注，所以添加了iceImg的字段
+//        CvTools.fillArea(iceImg, mops, ImgMode.ICE);
+//        image.setIceImg(iceImg);
         CvTools.fillArea(highLightImg, mops, ImgMode.HIGHLIGHT);
         image.setHighLightImg(highLightImg);
         return image;
@@ -130,11 +130,30 @@ public class IImageServiceImpl implements IImageService {
 
     @Override
     public Integer deleteImageInfoById(Integer id) {
-        return imageInfoMapper.deleteImageById(id);
+        Integer rows = imageInfoMapper.deleteImageById(id);
+        if(rows != 1){
+            throw new UpdateImageInfoFailedException("删除文件信息失败");
+        }
+        return rows;
     }
 
     @Override
     public List<ImageInfoEntity> getImageInfosByIdList(List<Integer> idList) {
         return imageInfoMapper.queryImageInfosByIdList(idList);
     }
+
+    @Override
+    public Integer getTotalCountByImgMode(Integer imgMode) {
+        return imageInfoMapper.queryTotalCountByImgMode(imgMode);
+    }
+
+    @Override
+    public Integer dislabelImageById(Integer imgId) {
+        Integer rows = imageInfoMapper.dislabelImageById(imgId);
+        if(rows != 1) {
+            throw new UpdateImageInfoFailedException("删除文件信息失败！");
+        }
+        return rows;
+    }
+
 }

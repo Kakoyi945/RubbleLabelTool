@@ -15,6 +15,7 @@ public class ImageEntity extends BaseEntity{
      * 文件名
      */
     private String fileName;
+
     /**
      * 图片宽度
      */
@@ -24,6 +25,16 @@ public class ImageEntity extends BaseEntity{
      * 图片长度
      */
     private Double height;
+
+    /**
+     * rgb图片格式（jpeg或者png）
+     */
+    private String rgbImgType;
+
+    /**
+     * ice图片格式（jpeg或者png）
+     */
+    private String iceImgType;
 
     /**
      * 原始rgb图
@@ -112,6 +123,22 @@ public class ImageEntity extends BaseEntity{
 
     public void setHighLightImg(Mat highLightImg) {
         this.highLightImg = highLightImg;
+    }
+
+    public String getRgbImgType() {
+        return rgbImgType;
+    }
+
+    public void setRgbImgType(String rgbImgType) {
+        this.rgbImgType = rgbImgType;
+    }
+
+    public String getIceImgType() {
+        return iceImgType;
+    }
+
+    public void setIceImgType(String iceImgType) {
+        this.iceImgType = iceImgType;
     }
 
     @Override

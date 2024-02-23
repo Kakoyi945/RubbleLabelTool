@@ -39,4 +39,11 @@ public interface IPointsService {
      * @return
      */
     Integer deletePointsById(Integer id);
+
+    /**
+     * 根据图片id删除点集
+     * @param imgId 图片id
+     * @return
+     */
+    Integer deletePointsByImgId(Integer imgId);
 }
