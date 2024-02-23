@@ -1,6 +1,5 @@
 package com.label.rubblelabeltool.util;
 
-import com.label.rubblelabeltool.config.DllsConfigurer;
 import com.label.rubblelabeltool.config.ImageConfigurer;
 import org.opencv.core.Core;
 import org.springframework.beans.factory.annotation.Autowired;
